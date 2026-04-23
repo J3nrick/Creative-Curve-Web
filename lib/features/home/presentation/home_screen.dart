@@ -131,20 +131,20 @@ class _ServiceTile extends StatefulWidget {
 }
 
 class _ServiceTileState extends State<_ServiceTile> {
-  bool _hovered = false;
+  bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOut,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: _hovered
+            colors: _isHovered
                 ? const <Color>[AppTheme.tileHoverRedTint, AppTheme.tileHoverBlueTint]
                 : <Color>[
                     AppTheme.tileBaseWhiteTint,
@@ -152,7 +152,7 @@ class _ServiceTileState extends State<_ServiceTile> {
                   ],
           ),
           border: Border.all(
-            color: _hovered ? AppTheme.electricBlue : AppTheme.tileBorderIdle,
+            color: _isHovered ? AppTheme.electricBlue : AppTheme.tileBorderIdle,
           ),
         ),
         padding: const EdgeInsets.all(16),
