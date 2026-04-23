@@ -27,27 +27,32 @@ abstract final class AppTheme {
       textTheme: base.textTheme.copyWith(
         displayLarge: const TextStyle(
           fontFamily: 'Space Grotesk',
+          fontFamilyFallback: <String>['Inter', 'sans-serif'],
           fontWeight: FontWeight.w700,
           color: _text,
           height: 1.1,
         ),
         headlineMedium: const TextStyle(
           fontFamily: 'Space Grotesk',
+          fontFamilyFallback: <String>['Inter', 'sans-serif'],
           fontWeight: FontWeight.w700,
           color: _text,
         ),
         titleLarge: const TextStyle(
           fontFamily: 'Space Grotesk',
+          fontFamilyFallback: <String>['Inter', 'sans-serif'],
           fontWeight: FontWeight.w600,
           color: _text,
         ),
         bodyLarge: const TextStyle(
           fontFamily: 'Inter',
+          fontFamilyFallback: <String>['Space Grotesk', 'sans-serif'],
           color: _text,
           height: 1.5,
         ),
         bodyMedium: const TextStyle(
           fontFamily: 'Inter',
+          fontFamilyFallback: <String>['Space Grotesk', 'sans-serif'],
           color: _text,
           height: 1.4,
         ),

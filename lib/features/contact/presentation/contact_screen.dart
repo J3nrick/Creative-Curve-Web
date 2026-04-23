@@ -30,6 +30,29 @@ class _ContactScreenState extends State<ContactScreen> {
     );
   }
 
+  bool _isValidEmail(String value) {
+    if (value.contains(' ') || value.contains('..')) {
+      return false;
+    }
+
+    final atParts = value.split('@');
+    if (atParts.length != 2) {
+      return false;
+    }
+
+    final local = atParts.first;
+    final domain = atParts.last;
+    if (local.isEmpty || domain.isEmpty) {
+      return false;
+    }
+
+    if (domain.startsWith('.') || domain.endsWith('.') || !domain.contains('.')) {
+      return false;
+    }
+
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,7 +77,7 @@ class _ContactScreenState extends State<ContactScreen> {
                     decoration: const InputDecoration(labelText: 'Email'),
                     validator: (value) {
                       final trimmed = value?.trim() ?? '';
-                      if (trimmed.isEmpty || !trimmed.contains('@')) {
+                      if (trimmed.isEmpty || !_isValidEmail(trimmed)) {
                         return 'Please enter a valid email';
                       }
                       return null;
