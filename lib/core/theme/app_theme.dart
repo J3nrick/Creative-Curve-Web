@@ -10,8 +10,12 @@ abstract final class AppTheme {
   static const Color tileHoverBlueTint = Color(0x3300A9FF);
   static const Color tileBaseWhiteTint = Color(0x1AFFFFFF);
   static const Color tileBorderIdle = Color(0x55FFFFFF);
+  static const Duration tileAnimationDuration = Duration(milliseconds: 200);
 
   /// Material 3 dark theme with premium, high-contrast agency styling.
+  ///
+  /// The custom font family names intentionally fall back to built-in sans-serif
+  /// stacks so the UI remains stable until bundled font assets are configured.
   static ThemeData get darkTheme {
     final base = ThemeData(
       useMaterial3: true,

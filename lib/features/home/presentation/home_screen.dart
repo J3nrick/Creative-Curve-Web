@@ -139,7 +139,7 @@ class _ServiceTileState extends State<_ServiceTile> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
+        duration: AppTheme.tileAnimationDuration,
         curve: Curves.easeOut,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
