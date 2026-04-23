@@ -1,4 +1,5 @@
 import 'package:creative_curve_web/core/constants/brand_constants.dart';
+import 'package:creative_curve_web/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 /// Services feature entry with interactive tiles.
@@ -47,8 +48,10 @@ class _InteractiveTileState extends State<_InteractiveTile> {
         curve: Curves.easeInOut,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: _isHovered ? const Color(0x33FF365E) : const Color(0x1AFFFFFF),
-          border: Border.all(color: _isHovered ? const Color(0xFF00A9FF) : const Color(0x44FFFFFF)),
+          color: _isHovered ? AppTheme.tileHoverRedTint : AppTheme.tileBaseWhiteTint,
+          border: Border.all(
+            color: _isHovered ? AppTheme.electricBlue : AppTheme.tileBorderIdle,
+          ),
         ),
         padding: const EdgeInsets.all(18),
         child: Align(

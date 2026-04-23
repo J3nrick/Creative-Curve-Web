@@ -1,5 +1,6 @@
 import 'package:creative_curve_web/core/constants/brand_constants.dart';
 import 'package:creative_curve_web/core/layout/responsive_layout.dart';
+import 'package:creative_curve_web/core/theme/app_theme.dart';
 import 'package:creative_curve_web/shared_widgets/agency_logo.dart';
 import 'package:creative_curve_web/shared_widgets/curve_button.dart';
 import 'package:flutter/material.dart';
@@ -144,18 +145,21 @@ class _ServiceTileState extends State<_ServiceTile> {
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
             colors: _hovered
-                ? const <Color>[Color(0x33FF365E), Color(0x3300A9FF)]
-                : const <Color>[Color(0x1FFFFFFF), Color(0x1200A9FF)],
+                ? const <Color>[AppTheme.tileHoverRedTint, AppTheme.tileHoverBlueTint]
+                : <Color>[
+                    AppTheme.tileBaseWhiteTint,
+                    AppTheme.electricBlue.withOpacity(0.07),
+                  ],
           ),
           border: Border.all(
-            color: _hovered ? const Color(0xFF00A9FF) : const Color(0x55FFFFFF),
+            color: _hovered ? AppTheme.electricBlue : AppTheme.tileBorderIdle,
           ),
         ),
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const Icon(Icons.auto_graph, color: Color(0xFF00A9FF)),
+            Icon(Icons.auto_graph, color: Theme.of(context).colorScheme.secondary),
             const SizedBox(height: 14),
             Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
             const Spacer(),

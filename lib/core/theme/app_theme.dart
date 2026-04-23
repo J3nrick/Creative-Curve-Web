@@ -2,24 +2,28 @@ import 'package:flutter/material.dart';
 
 /// Theme registry for the Creative Curve design system.
 abstract final class AppTheme {
-  static const Color _background = Color(0xFF121212);
-  static const Color _text = Color(0xFFF5F5F7);
-  static const Color _curveRed = Color(0xFFFF365E);
-  static const Color _electricBlue = Color(0xFF00A9FF);
+  static const Color background = Color(0xFF121212);
+  static const Color text = Color(0xFFF5F5F7);
+  static const Color curveRed = Color(0xFFFF365E);
+  static const Color electricBlue = Color(0xFF00A9FF);
+  static const Color tileHoverRedTint = Color(0x33FF365E);
+  static const Color tileHoverBlueTint = Color(0x3300A9FF);
+  static const Color tileBaseWhiteTint = Color(0x1AFFFFFF);
+  static const Color tileBorderIdle = Color(0x55FFFFFF);
 
   /// Material 3 dark theme with premium, high-contrast agency styling.
   static ThemeData get darkTheme {
     final base = ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: _background,
+      scaffoldBackgroundColor: background,
       colorScheme: const ColorScheme.dark(
-        primary: _curveRed,
-        secondary: _electricBlue,
+        primary: curveRed,
+        secondary: electricBlue,
         surface: Color(0xFF1A1A1D),
-        onPrimary: _text,
-        onSecondary: _text,
-        onSurface: _text,
+        onPrimary: text,
+        onSecondary: text,
+        onSurface: text,
       ),
     );
 
@@ -29,31 +33,31 @@ abstract final class AppTheme {
           fontFamily: 'Space Grotesk',
           fontFamilyFallback: <String>['Inter', 'sans-serif'],
           fontWeight: FontWeight.w700,
-          color: _text,
+          color: text,
           height: 1.1,
         ),
         headlineMedium: const TextStyle(
           fontFamily: 'Space Grotesk',
           fontFamilyFallback: <String>['Inter', 'sans-serif'],
           fontWeight: FontWeight.w700,
-          color: _text,
+          color: text,
         ),
         titleLarge: const TextStyle(
           fontFamily: 'Space Grotesk',
           fontFamilyFallback: <String>['Inter', 'sans-serif'],
           fontWeight: FontWeight.w600,
-          color: _text,
+          color: text,
         ),
         bodyLarge: const TextStyle(
           fontFamily: 'Inter',
           fontFamilyFallback: <String>['Space Grotesk', 'sans-serif'],
-          color: _text,
+          color: text,
           height: 1.5,
         ),
         bodyMedium: const TextStyle(
           fontFamily: 'Inter',
           fontFamilyFallback: <String>['Space Grotesk', 'sans-serif'],
-          color: _text,
+          color: text,
           height: 1.4,
         ),
       ),
@@ -66,8 +70,8 @@ abstract final class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          foregroundColor: _text,
-          backgroundColor: _curveRed,
+          foregroundColor: text,
+          backgroundColor: curveRed,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

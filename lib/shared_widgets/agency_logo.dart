@@ -15,7 +15,10 @@ class AgencyLogo extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        const Icon(Icons.scatter_plot_outlined, color: Color(0xFF00A9FF)),
+        Icon(
+          Icons.scatter_plot_outlined,
+          color: Theme.of(context).colorScheme.secondary,
+        ),
         const SizedBox(width: 8),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
