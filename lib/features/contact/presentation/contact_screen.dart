@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 
 /// Contact feature entry with validated form and loading feedback.
@@ -30,29 +31,6 @@ class _ContactScreenState extends State<ContactScreen> {
     );
   }
 
-  bool _isValidEmail(String value) {
-    if (value.contains(' ') || value.contains('..')) {
-      return false;
-    }
-
-    final atParts = value.split('@');
-    if (atParts.length != 2) {
-      return false;
-    }
-
-    final local = atParts.first;
-    final domain = atParts.last;
-    if (local.isEmpty || domain.isEmpty) {
-      return false;
-    }
-
-    if (domain.startsWith('.') || domain.endsWith('.') || !domain.contains('.')) {
-      return false;
-    }
-
-    return true;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,7 +55,7 @@ class _ContactScreenState extends State<ContactScreen> {
                     decoration: const InputDecoration(labelText: 'Email'),
                     validator: (value) {
                       final trimmed = value?.trim() ?? '';
-                      if (trimmed.isEmpty || !_isValidEmail(trimmed)) {
+                      if (trimmed.isEmpty || !EmailValidator.validate(trimmed)) {
                         return 'Please enter a valid email';
                       }
                       return null;
