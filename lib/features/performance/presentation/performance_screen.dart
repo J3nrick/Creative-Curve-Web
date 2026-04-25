@@ -8,6 +8,7 @@ class PerformanceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isMobile = ResponsiveLayout.isMobile(context);
+    
     const List<({String label, String value, Color tone})> cards =
         <({String label, String value, Color tone})>[
       (label: 'Clients Landed', value: '4', tone: Color(0xFFFFF5F5)),
@@ -103,13 +104,13 @@ class _MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = AppColors.isDark(context);
+
     return Container(
       width: width,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.isDark(context)
-            ? AppColors.elevatedSurfaceFor(context)
-            : tone,
+        color: isDark ? AppColors.elevatedSurfaceFor(context) : tone,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.strokeFor(context)),
       ),
@@ -119,7 +120,7 @@ class _MetricCard extends StatelessWidget {
           Text(
             value,
             style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  color: AppColors.charcoal,
+                  color: AppColors.textFor(context),
                   fontWeight: FontWeight.w800,
                 ),
           ),
@@ -127,7 +128,7 @@ class _MetricCard extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.textFor(context),
+                  color: AppColors.mutedFor(context),
                 ),
           ),
         ],
@@ -152,6 +153,11 @@ class _GrowthBars extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final bool narrow = constraints.maxWidth < 460;
+        
+        // FIXED: Using .withValues() instead of .withOpacity()
+        final Color trackColor = AppColors.isDark(context) 
+            ? Colors.white.withValues(alpha: 0.1) 
+            : Colors.black.withValues(alpha: 0.05);
 
         return Column(
           children: rows
@@ -167,17 +173,7 @@ class _GrowthBars extends StatelessWidget {
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                             const SizedBox(height: 8),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(999),
-                              child: LinearProgressIndicator(
-                                value: row.score,
-                                minHeight: 10,
-                                backgroundColor: AppColors.isDark(context)
-                                    ? Colors.white12
-                                    : Colors.white,
-                                color: AppColors.curveRed,
-                              ),
-                            ),
+                            _ProgressBar(score: row.score, backgroundColor: trackColor),
                           ],
                         )
                       : Row(
@@ -191,17 +187,7 @@ class _GrowthBars extends StatelessWidget {
                             ),
                             const SizedBox(width: 12),
                             Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(999),
-                                child: LinearProgressIndicator(
-                                  value: row.score,
-                                  minHeight: 10,
-                                  backgroundColor: AppColors.isDark(context)
-                                      ? Colors.white12
-                                      : Colors.white,
-                                  color: AppColors.curveRed,
-                                ),
-                              ),
+                              child: _ProgressBar(score: row.score, backgroundColor: trackColor),
                             ),
                           ],
                         ),
@@ -210,6 +196,25 @@ class _GrowthBars extends StatelessWidget {
               .toList(),
         );
       },
+    );
+  }
+}
+
+class _ProgressBar extends StatelessWidget {
+  const _ProgressBar({required this.score, required this.backgroundColor});
+  final double score;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(999),
+      child: LinearProgressIndicator(
+        value: score,
+        minHeight: 10,
+        backgroundColor: backgroundColor,
+        color: AppColors.curveRed,
+      ),
     );
   }
 }

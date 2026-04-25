@@ -34,7 +34,6 @@ class ToolsScreen extends StatelessWidget {
     ),
     (
       name: 'DaVinci Resolve',
-      // Using a reliable public PNG for DaVinci
       imageUrl: 'https://img.icons8.com/color/512/adobe-premiere-pro.png',
       tone: Color(0xFFF3FAFF),
     ),
@@ -65,7 +64,12 @@ class ToolsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text('Tools', style: Theme.of(context).textTheme.displayMedium),
+            Text(
+              'Tools',
+              style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                    color: AppColors.textFor(context),
+                  ),
+            ),
             const SizedBox(height: 10),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 760),
@@ -89,8 +93,7 @@ class ToolsScreen extends StatelessWidget {
                 childAspectRatio: columns == 1 ? 2.8 : 1.35,
               ),
               itemBuilder: (BuildContext context, int index) {
-                final ({String name, String imageUrl, Color tone}) item =
-                    _tools[index];
+                final item = _tools[index];
                 return _ToolCard(
                   name: item.name,
                   imageUrl: item.imageUrl,
@@ -125,19 +128,18 @@ class _ToolCardState extends State<_ToolCard> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = AppColors.isDark(context);
+
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
         curve: Curves.easeOutCubic,
-        transform: Matrix4.identity()
-          ..translateByDouble(0.0, _hovered ? -4.0 : 0.0, 0.0, 1.0),
+        transform: Matrix4.translationValues(0.0, _hovered ? -4.0 : 0.0, 0.0),
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: AppColors.isDark(context)
-              ? AppColors.elevatedSurfaceFor(context)
-              : widget.tone,
+          color: isDark ? AppColors.elevatedSurfaceFor(context) : widget.tone,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: AppColors.strokeFor(context)),
           boxShadow: _hovered
@@ -157,9 +159,7 @@ class _ToolCardState extends State<_ToolCard> {
               height: 58,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: AppColors.isDark(context)
-                    ? AppColors.surfaceDark
-                    : Colors.white,
+                color: isDark ? AppColors.surfaceDark : Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.strokeFor(context)),
               ),
@@ -168,10 +168,11 @@ class _ToolCardState extends State<_ToolCard> {
                 width: 36,
                 height: 36,
                 fit: BoxFit.contain,
-                errorBuilder: (BuildContext context, Object error,
-                    StackTrace? stackTrace) {
-                  return const Icon(Icons.widgets_outlined,
-                      color: AppColors.charcoal);
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    Icons.widgets_outlined,
+                    color: AppColors.textFor(context).withValues(alpha: 0.5),
+                  );
                 },
               ),
             ),
@@ -179,10 +180,10 @@ class _ToolCardState extends State<_ToolCard> {
             Expanded(
               child: Text(
                 widget.name,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w700),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textFor(context), // Fixed: Text adapts to theme
+                    ),
               ),
             ),
           ],

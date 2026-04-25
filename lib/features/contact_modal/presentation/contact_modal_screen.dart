@@ -133,8 +133,6 @@ class _PanelHeader extends StatelessWidget {
 
     return Row(
       children: <Widget>[
-        const _MacTrafficLights(),
-        const SizedBox(width: 14),
         Expanded(
           child: CurveLogo(
             height: 28,
@@ -150,41 +148,6 @@ class _PanelHeader extends StatelessWidget {
               ),
         ),
       ],
-    );
-  }
-}
-
-class _MacTrafficLights extends StatelessWidget {
-  const _MacTrafficLights();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Row(
-      children: <Widget>[
-        _Dot(color: Color(0xFFFF5F57)),
-        SizedBox(width: 6),
-        _Dot(color: Color(0xFFFFBD2E)),
-        SizedBox(width: 6),
-        _Dot(color: Color(0xFF28C840)),
-      ],
-    );
-  }
-}
-
-class _Dot extends StatelessWidget {
-  const _Dot({required this.color});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 10,
-      height: 10,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color,
-      ),
     );
   }
 }
