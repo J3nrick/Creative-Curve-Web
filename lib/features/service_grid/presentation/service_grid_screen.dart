@@ -85,12 +85,12 @@ class ServiceGridScreen extends StatelessWidget {
                   itemCount: _items.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: columns,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: columns == 1 ? 2.1 : 1.35,
+                    crossAxisSpacing: 20,
+                    mainAxisSpacing: 20,
+                    childAspectRatio: columns == 1 ? 1.5 : (columns == 2 ? 1.1 : 0.95),
                   ),
                   itemBuilder: (BuildContext context, int index) {
-                    final ({String title, String summary}) item = _items[index];
+                    final item = _items[index];
                     return _ServiceOutlineCard(
                       title: item.title,
                       summary: item.summary,
@@ -126,81 +126,65 @@ class _ServiceOutlineCardState extends State<_ServiceOutlineCard> {
       onExit: (_) => setState(() => _hovered = false),
       cursor: SystemMouseCursors.click,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutQuart,
         transform: Matrix4.identity()
-          ..translateByDouble(0.0, _hovered ? -5.0 : 0.0, 0.0, 1.0),
-        padding: const EdgeInsets.all(20),
+          ..translateByDouble(0.0, _hovered ? -8.0 : 0.0, 0.0, 1.0),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: AppColors.elevatedSurfaceFor(context),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: _hovered
-                ? AppColors.curveRed.withValues(alpha: 0.46)
-                : AppColors.strokeFor(context),
+            color: _hovered ? AppColors.curveRed : AppColors.strokeFor(context),
+            width: _hovered ? 1.5 : 1.0,
           ),
-          boxShadow: _hovered
-              ? <BoxShadow>[
-                  BoxShadow(
-                    color: AppColors.curveRed.withValues(alpha: 0.11),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ]
-              : const <BoxShadow>[],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Row(
-              children: <Widget>[
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Expanded(
                   child: Text(
                     widget.title,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge
-                        ?.copyWith(fontWeight: FontWeight.w700),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 20,
+                          height: 1.1,
+                        ),
                   ),
                 ),
-                AnimatedScale(
-                  duration: const Duration(milliseconds: 180),
-                  curve: Curves.easeOut,
-                  scale: _hovered ? 1.0 : 0.6,
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 180),
-                    opacity: _hovered ? 1 : 0,
-                    child: Container(
-                      width: 10,
-                      height: 10,
-                      decoration: const BoxDecoration(
-                        color: AppColors.curveRed,
-                        shape: BoxShape.circle,
-                      ),
+                const SizedBox(width: 8),
+                if (_hovered)
+                  Container(
+                    width: 8,
+                    height: 8,
+                    margin: const EdgeInsets.only(top: 6),
+                    decoration: const BoxDecoration(
+                      color: AppColors.curveRed,
+                      shape: BoxShape.circle,
                     ),
                   ),
-                ),
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             Text(
               widget.summary,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: AppColors.mutedFor(context)),
-            ),
-            const Spacer(),
-            const SizedBox(height: 10),
-            Text(
-              'Explore',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: _hovered
-                        ? AppColors.textFor(context)
-                        : AppColors.mutedFor(context),
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.2,
+                    color: AppColors.mutedFor(context),
+                    height: 1.5,
                   ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Explore →',
+              style: TextStyle(
+                color: _hovered ? AppColors.textFor(context) : AppColors.mutedFor(context),
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),

@@ -57,7 +57,7 @@ class HomeHeroSection extends StatelessWidget {
         mainAxisSize: MainAxisSize.min, // Vital: takes only needed space
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          _HeroCopy(compact: true),
+          const _HeroCopy(compact: true),
           const SizedBox(height: 24),
           // DYNAMIC VISUAL BOX
           ConstrainedBox(
