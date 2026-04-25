@@ -1,5 +1,6 @@
 import 'package:creative_curve_web/core/constants/app_colors.dart';
 import 'package:creative_curve_web/features/hero/application/hero_scroll_state.dart';
+import 'package:creative_curve_web/shared/widgets/curve_logo.dart';
 import 'package:creative_curve_web/shared/widgets/mac_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,7 +30,9 @@ class _HeroScreenState extends ConsumerState<HeroScreen> {
   }
 
   void _onScroll() {
-    ref.read(heroScrollOffsetProvider.notifier).setOffset(_scrollController.offset);
+    ref
+        .read(heroScrollOffsetProvider.notifier)
+        .setOffset(_scrollController.offset);
   }
 
   @override
@@ -38,7 +41,8 @@ class _HeroScreenState extends ConsumerState<HeroScreen> {
 
     return CustomScrollView(
       controller: _scrollController,
-      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+      physics:
+          const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
       slivers: <Widget>[
         SliverFillRemaining(
           hasScrollBody: false,
@@ -47,9 +51,7 @@ class _HeroScreenState extends ConsumerState<HeroScreen> {
               horizontal: compact ? 24 : 56,
               vertical: compact ? 22 : 44,
             ),
-            child: compact
-                ? const _HeroCompact()
-                : const _HeroDesktop(),
+            child: compact ? const _HeroCompact() : const _HeroDesktop(),
           ),
         ),
       ],
@@ -69,7 +71,7 @@ class _HeroDesktop extends StatelessWidget {
           flex: 5,
           child: _EditorialCopy(
             title: 'Because\nstraightforward\nis too\npredictable.',
-            subtitle: 'CREATIVE CURVE STUDIOS',
+            subtitle: 'Creative Curve Studios',
           ),
         ),
         SizedBox(width: 42),
@@ -100,7 +102,7 @@ class _HeroCompact extends StatelessWidget {
       children: <Widget>[
         _EditorialCopy(
           title: 'Because straightforward\nis too predictable.',
-          subtitle: 'CREATIVE CURVE STUDIOS',
+          subtitle: 'Creative Curve Studios',
         ),
         SizedBox(height: 18),
         MacCachedImage(
@@ -138,10 +140,12 @@ class _EditorialCopyState extends State<_EditorialCopy> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text(
-          widget.subtitle,
-          style: textTheme.labelLarge,
+        const CurveLogo(
+          height: 42,
+          semanticLabel: 'Creative Curve logo',
         ),
+        const SizedBox(height: 10),
+        Text(widget.subtitle, style: textTheme.labelLarge),
         const SizedBox(height: 14),
         Text(
           widget.title,
@@ -155,7 +159,8 @@ class _EditorialCopyState extends State<_EditorialCopy> {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeOutCubic,
-            transform: Matrix4.identity()..translateByDouble(0.0, _hovered ? -2.0 : 0.0, 0.0, 1.0),
+            transform: Matrix4.identity()
+              ..translateByDouble(0.0, _hovered ? -2.0 : 0.0, 0.0, 1.0),
             decoration: BoxDecoration(
               color: _hovered ? AppColors.curveRed : AppColors.charcoal,
               borderRadius: BorderRadius.circular(999),

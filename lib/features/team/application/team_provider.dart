@@ -11,30 +11,38 @@ class TeamMembers extends _$TeamMembers {
       TeamMember(
         name: 'Krystal',
         role: 'Project Manager',
-        tagline: 'Disney princess spirit',
-        specialty: 'Growth & Efficiency',
-        hobbies: <String>['Travel', 'Singing'],
+        focus:
+            'Growth, efficiency, and project collaboration from start to finish.',
+        personality: 'Keeps teams aligned, calm, and moving with precision.',
+        hobbies: <String>['Travel', 'Singing', 'Exploring new things'],
+        photoTodo: 'Team Photo 1',
       ),
       TeamMember(
         name: 'Zyle',
-        role: 'Sales / Content Strategist',
-        tagline: 'Making things happen',
-        specialty: 'Relationship amplifier',
-        hobbies: <String>['Tennis', 'Golf', 'Cooking'],
+        role: 'Sales & Content',
+        focus:
+            'Campaign storytelling, sales velocity, and unconventional strategy.',
+        personality: 'The go-to operator for making things happen at speed.',
+        hobbies: <String>['Tennis', 'Golf', 'Mobile games', 'Cooking'],
+        photoTodo: 'Team Photo 2',
       ),
       TeamMember(
         name: 'Erika',
         role: 'Creative Lead',
-        tagline: 'Creative maarteng girly',
-        specialty: 'Branding visionary',
+        focus:
+            'Creative vision, branding direction, and final review of assets and copy.',
+        personality: 'Crafts bold visual systems with intentional detail.',
         hobbies: <String>['Tennis', 'Golf', 'Oil Painting'],
+        photoTodo: 'Team Photo 3',
       ),
       TeamMember(
         name: 'JP',
         role: 'Media Producer',
-        tagline: 'High-quality visuals and storytelling',
-        specialty: 'Visual narrative systems',
+        focus:
+            'High-quality visual storytelling through photo and video production.',
+        personality: 'Turns concepts into polished visual narratives.',
         hobbies: <String>['Photography', 'Cafe Hopping', 'Anime'],
+        photoTodo: 'Team Photo 4',
       ),
     ];
   }
