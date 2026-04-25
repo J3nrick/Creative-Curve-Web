@@ -46,7 +46,12 @@ class _HomeScreenState extends State<HomeScreen>
       opacity: _fade,
       child: SlideTransition(
         position: _slide,
-        child: const HomeHeroSection(),
+        // Wrap the Hero section in a ScrollView so it doesn't 
+        // crash (overflow) when the screen is too short.
+        child: const SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: HomeHeroSection(),
+        ),
       ),
     );
   }

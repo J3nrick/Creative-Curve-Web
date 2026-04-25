@@ -36,37 +36,42 @@ class HomeHeroSection extends StatelessWidget {
           final double desktopHeight = constraints.maxWidth < 1180 ? 600 : 640;
 
           if (compact) {
-            return Container(
-              padding: EdgeInsets.fromLTRB(
-                tiny ? 14 : 18,
-                18,
-                tiny ? 14 : 18,
-                tiny ? 14 : 18,
-              ),
-              decoration: ShapeDecoration(
-                color: AppColors.surfaceFor(context),
-                shape: SmoothRectangleBorder(
-                  borderRadius: SmoothBorderRadius(
-                    cornerRadius: 24,
-                    cornerSmoothing: 0.6,
-                  ),
-                  side: BorderSide(color: AppColors.strokeFor(context)),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  const _HeroCopy(compact: true),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    height: tiny ? 220 : 250,
-                    width: double.infinity,
-                    child: const _HeroVisualDeck(),
-                  ),
-                ],
-              ),
-            );
-          }
+  return Container(
+    // Added width constraint to prevent horizontal stretching
+    width: double.infinity,
+    padding: EdgeInsets.all(tiny ? 16 : 24),
+    decoration: ShapeDecoration(
+      color: AppColors.surfaceFor(context),
+      shape: SmoothRectangleBorder(
+        borderRadius: SmoothBorderRadius(
+          cornerRadius: 24,
+          cornerSmoothing: 0.6,
+        ),
+        side: BorderSide(color: AppColors.strokeFor(context)),
+      ),
+    ),
+    // WRAP IN SCROLLVIEW TO FIX OVERFLOW
+    child: SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(), // Keeps it feeling tight
+      child: Column(
+        mainAxisSize: MainAxisSize.min, // Vital: takes only needed space
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          _HeroCopy(compact: true),
+          const SizedBox(height: 24),
+          // DYNAMIC VISUAL BOX
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              // Allow the image to be smaller on tiny phones
+              maxHeight: tiny ? 180 : 250, 
+            ),
+            child: const _HeroVisualDeck(),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
           return SizedBox(
             height: desktopHeight,

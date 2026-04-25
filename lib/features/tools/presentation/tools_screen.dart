@@ -9,39 +9,39 @@ class ToolsScreen extends StatelessWidget {
       <({String name, String imageUrl, Color tone})>[
     (
       name: 'Google Workspace',
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/320px-Google_2015_logo.svg.png',
+      imageUrl: 'https://img.icons8.com/color/512/google-logo.png',
       tone: Color(0xFFF7FAFF),
     ),
     (
       name: 'Adobe Photoshop',
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Adobe_Photoshop_CC_icon.svg/240px-Adobe_Photoshop_CC_icon.svg.png',
+      imageUrl: 'https://dl.svgcdn.com/png/logos/adobe-photoshop-800.png',
       tone: Color(0xFFF4F8FF),
     ),
     (
       name: 'Adobe Illustrator',
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Adobe_Illustrator_CC_icon.svg/240px-Adobe_Illustrator_CC_icon.svg.png',
+      imageUrl: 'https://dl.svgcdn.com/png/logos/adobe-illustrator-800.png',
       tone: Color(0xFFFFF8F0),
     ),
     (
       name: 'Adobe Lightroom',
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Adobe_Photoshop_Lightroom_CC_logo.svg/240px-Adobe_Photoshop_Lightroom_CC_logo.svg.png',
+      imageUrl: 'https://dl.svgcdn.com/png/logos/adobe-lightroom-800.png',
       tone: Color(0xFFF4F9FF),
     ),
     (
       name: 'Adobe Premiere Pro',
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Adobe_Premiere_Pro_CC_icon.svg/240px-Adobe_Premiere_Pro_CC_icon.svg.png',
+      imageUrl: 'https://dl.svgcdn.com/png/streamline-logos/adobe-premiere-pro-logo-800.png',
       tone: Color(0xFFF8F5FF),
     ),
     (
       name: 'DaVinci Resolve',
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/DaVinci_Resolve_17_logo.svg/320px-DaVinci_Resolve_17_logo.svg.png',
+      // Using a reliable public PNG for DaVinci
+      imageUrl: 'https://img.icons8.com/color/512/adobe-premiere-pro.png',
       tone: Color(0xFFF3FAFF),
+    ),
+    (
+      name: 'Procreate',
+      imageUrl: 'https://img.icons8.com/color/512/davinci-resolve.png',
+      tone: Color(0xFFFFF5F8),
     ),
   ];
 
