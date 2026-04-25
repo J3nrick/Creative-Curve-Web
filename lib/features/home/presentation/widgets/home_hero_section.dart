@@ -164,15 +164,7 @@ class _HeroCopy extends StatelessWidget {
             ),
           ],
         ),
-        if (!compact) ...<Widget>[
-          const Spacer(),
-          Text(
-            '60 / 40 asymmetry keeps hierarchy clear while preserving depth across desktop and mobile.',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.mutedFor(context),
-                ),
-          ),
-        ],
+       
       ],
     );
   }

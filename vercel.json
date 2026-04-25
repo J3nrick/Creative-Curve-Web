@@ -1,18 +1,15 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "framework": null,
-  "installCommand": "echo 'Skipping default install step'",
   "buildCommand": "bash ./vercel-build.sh",
   "outputDirectory": "build/web",
   "routes": [
     {
-      "handle": "filesystem"
+      "src": "/(.*)",
+      "dest": "/$1"
     },
     {
       "src": "/.*",
       "dest": "/index.html"
     }
-  ],
-  "trailingSlash": false
+  ]
 }
