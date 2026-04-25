@@ -140,7 +140,11 @@ class _MemberCardState extends State<_MemberCard> {
                 Expanded(
                   child: Text(
                     widget.member.name,
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          color: AppColors.textFor(context),
+                        ),
                   ),
                 ),
               ],

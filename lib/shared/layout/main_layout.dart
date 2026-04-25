@@ -90,16 +90,16 @@ class _MobileFrame extends StatelessWidget {
   const _MobileFrame({
     required this.currentPath,
     required this.items,
-    required this.child,
     required this.themeMode,
     required this.onToggleTheme,
+    required this.child,
   });
 
   final String currentPath;
   final List<({String label, String path})> items;
-  final Widget child;
   final ThemeMode themeMode;
   final VoidCallback onToggleTheme;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -153,10 +153,10 @@ class _MobileFrame extends StatelessWidget {
                         height: 30, semanticLabel: 'Creative Curve logo'),
                     const Spacer(),
                     IconButton(
+                      onPressed: onToggleTheme,
                       tooltip: themeMode == ThemeMode.dark
                           ? 'Switch to light mode'
                           : 'Switch to dark mode',
-                      onPressed: onToggleTheme,
                       icon: Icon(
                         themeMode == ThemeMode.dark
                             ? Icons.wb_sunny_rounded

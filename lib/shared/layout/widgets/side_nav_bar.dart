@@ -26,7 +26,7 @@ class SideNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 112,
+      width: 132,
       margin: const EdgeInsets.fromLTRB(14, 14, 10, 14),
       decoration: ShapeDecoration(
         color: AppColors.surfaceFor(context),
@@ -38,7 +38,7 @@ class SideNavBar extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 14, 8, 6),
+            padding: const EdgeInsets.fromLTRB(10, 14, 6, 6),
             child: Row(
               children: <Widget>[
                 const Expanded(
@@ -48,17 +48,26 @@ class SideNavBar extends StatelessWidget {
                   ),
                 ),
                 IconButton(
+                  onPressed: onToggleTheme,
                   tooltip: themeMode == ThemeMode.dark
                       ? 'Switch to light mode'
                       : 'Switch to dark mode',
-                  onPressed: onToggleTheme,
+                  splashColor: Colors.transparent,
+                  hoverColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    surfaceTintColor: Colors.transparent,
+                    padding: const EdgeInsets.all(4),
+                    minimumSize: const Size(24, 24),
+                  ),
                   icon: Icon(
                     themeMode == ThemeMode.dark
                         ? Icons.wb_sunny_rounded
                         : Icons.dark_mode_rounded,
                     size: 18,
+                    color: AppColors.textFor(context),
                   ),
-                  visualDensity: VisualDensity.compact,
                 ),
               ],
             ),
@@ -139,15 +148,16 @@ class _SideNavButtonState extends State<_SideNavButton> {
           ),
           child: Text(
             widget.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+            overflow: TextOverflow.visible,
+            softWrap: true,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: widget.active
                       ? AppColors.textFor(context)
                       : AppColors.mutedFor(context),
                   fontWeight: widget.active ? FontWeight.w700 : FontWeight.w500,
-                  letterSpacing: 0.1,
+                  letterSpacing: 0,
                 ),
           ),
         ),

@@ -179,9 +179,7 @@ class _HeroCopy extends StatelessWidget {
 }
 
 class _HeroVisual extends StatelessWidget {
-  const _HeroVisual({
-    required this.child,
-  });
+  const _HeroVisual({required this.child});
 
   final Widget child;
 
@@ -215,7 +213,7 @@ class _HeroVisual extends StatelessWidget {
             right: -35,
             child: _GlowOrb(
               size: 190,
-              color: AppColors.curveRed.withValues(alpha: 0.22),
+              color: AppColors.curveRed.withValues(alpha: 0.16),
             ),
           ),
           Positioned(
@@ -223,7 +221,7 @@ class _HeroVisual extends StatelessWidget {
             left: -35,
             child: _GlowOrb(
               size: 210,
-              color: AppColors.textFor(context).withValues(alpha: 0.08),
+              color: AppColors.textFor(context).withValues(alpha: 0.06),
             ),
           ),
           Positioned.fill(
@@ -247,17 +245,17 @@ class _HeroVisualDeck extends StatefulWidget {
 
 class _HeroVisualDeckState extends State<_HeroVisualDeck> {
   static const Duration _holdDuration = Duration(milliseconds: 4600);
-  static const Duration _transitionDuration = Duration(milliseconds: 900);
+  static const Duration _transitionDuration = Duration(milliseconds: 950);
+
+  static const List<String> _images = <String>[
+    'assets/Home1.png',
+    'assets/Home2.png',
+    'assets/Home3.png',
+    'assets/Home4.png',
+  ];
 
   late final Timer _timer;
   int _index = 0;
-
-  static const List<String> _labels = <String>[
-    'Discover',
-    'Brand',
-    'Predictable',
-    'Who Are We',
-  ];
 
   @override
   void initState() {
@@ -266,7 +264,7 @@ class _HeroVisualDeckState extends State<_HeroVisualDeck> {
       if (!mounted) {
         return;
       }
-      setState(() => _index = (_index + 1) % _labels.length);
+      setState(() => _index = (_index + 1) % _images.length);
     });
   }
 
@@ -282,44 +280,72 @@ class _HeroVisualDeckState extends State<_HeroVisualDeck> {
       child: Column(
         children: <Widget>[
           Expanded(
-            child: AnimatedSwitcher(
-              duration: _transitionDuration,
-              reverseDuration: const Duration(milliseconds: 650),
-              switchInCurve: Curves.easeOutQuart,
-              switchOutCurve: Curves.easeInCubic,
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                final Animation<Offset> slide = Tween<Offset>(
-                  begin: const Offset(0.14, 0),
-                  end: Offset.zero,
-                ).animate(animation);
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: AnimatedSwitcher(
+                duration: _transitionDuration,
+                reverseDuration: const Duration(milliseconds: 680),
+                switchInCurve: Curves.easeOutQuart,
+                switchOutCurve: Curves.easeInCubic,
+                transitionBuilder: (
+                  Widget child,
+                  Animation<double> animation,
+                ) {
+                  final Animation<Offset> slide = Tween<Offset>(
+                    begin: const Offset(0.2, 0),
+                    end: Offset.zero,
+                  ).animate(animation);
 
-                final Animation<double> fade = CurvedAnimation(
-                  parent: animation,
-                  curve: Curves.easeOut,
-                );
+                  final Animation<double> fade = CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOut,
+                  );
 
-                final Animation<double> scale = Tween<double>(
-                  begin: 0.98,
-                  end: 1,
-                ).animate(animation);
+                  final Animation<double> tilt = Tween<double>(
+                    begin: 0.02,
+                    end: 0,
+                  ).animate(animation);
 
-                return FadeTransition(
-                  opacity: fade,
-                  child: SlideTransition(
-                    position: slide,
-                    child: ScaleTransition(scale: scale, child: child),
+                  return FadeTransition(
+                    opacity: fade,
+                    child: SlideTransition(
+                      position: slide,
+                      child: AnimatedBuilder(
+                        animation: tilt,
+                        child: child,
+                        builder: (BuildContext context, Widget? inner) {
+                          return Transform(
+                            alignment: Alignment.center,
+                            transform: Matrix4.identity()
+                              ..setEntry(3, 2, 0.001)
+                              ..rotateY(tilt.value),
+                            child: inner,
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  key: ValueKey<int>(_index),
+                  color:
+                      AppColors.backgroundFor(context).withValues(alpha: 0.2),
+                  child: Center(
+                    child: Image.asset(
+                      _images[_index],
+                      fit: BoxFit.contain,
+                      width: double.infinity,
+                      height: double.infinity,
+                      filterQuality: FilterQuality.high,
+                    ),
                   ),
-                );
-              },
-              child: KeyedSubtree(
-                key: ValueKey<int>(_index),
-                child: _buildFrame(context, _index),
+                ),
               ),
             ),
           ),
           const SizedBox(height: 8),
           Row(
-            children: List<Widget>.generate(_labels.length, (int i) {
+            children: List<Widget>.generate(_images.length, (int i) {
               final bool active = i == _index;
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 260),
@@ -337,258 +363,6 @@ class _HeroVisualDeckState extends State<_HeroVisualDeck> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildFrame(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        return const _DiscoverCurveFrame();
-      case 1:
-        return const _BrandLogoFrame();
-      case 2:
-        return const _PredictableFrame();
-      default:
-        return const _WhoAreWeFrame();
-    }
-  }
-}
-
-class _DiscoverCurveFrame extends StatelessWidget {
-  const _DiscoverCurveFrame();
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final bool narrow = constraints.maxWidth < 260;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'discover\ncurve',
-              style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    color: AppColors.curveRed,
-                    fontSize: narrow ? 36 : 48,
-                    height: 0.92,
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                  child: Text(
-                    'Digital creative agency driven by storytellers and strategists.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textFor(context),
-                        ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Our approach is not about taking the easy route.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.mutedFor(context),
-                        ),
-                  ),
-                ),
-              ],
-            ),
-            const Spacer(),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Text.rich(
-                const TextSpan(
-                  children: <InlineSpan>[
-                    TextSpan(text: 'A unique path that keeps '),
-                    TextSpan(
-                      text: 'your brand',
-                      style: TextStyle(
-                        color: AppColors.curveRed,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    TextSpan(text: ' ahead.'),
-                  ],
-                ),
-                textAlign: TextAlign.right,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textFor(context),
-                    ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _BrandLogoFrame extends StatelessWidget {
-  const _BrandLogoFrame();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        color: AppColors.curveRed.withValues(alpha: 0.96),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            'creative',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w400,
-                ),
-          ),
-          const SizedBox(height: 8),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              'curve',
-              style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                    color: Colors.white,
-                    fontSize: 92,
-                    height: 0.9,
-                  ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'studios',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w400,
-                ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PredictableFrame extends StatelessWidget {
-  const _PredictableFrame();
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        alignment: Alignment.centerRight,
-        child: SizedBox(
-          width: 330,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                'because straightforward',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: AppColors.curveRed,
-                      fontWeight: FontWeight.w400,
-                    ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                width: 1.3,
-                height: 72,
-                color: AppColors.curveRed.withValues(alpha: 0.8),
-              ),
-              const SizedBox(height: 8),
-              Text.rich(
-                TextSpan(
-                  children: <InlineSpan>[
-                    TextSpan(
-                      text: 'is ',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: AppColors.textFor(context),
-                            fontWeight: FontWeight.w400,
-                          ),
-                    ),
-                    TextSpan(
-                      text: 'too',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: AppColors.curveRed,
-                            fontWeight: FontWeight.w700,
-                          ),
-                    ),
-                    TextSpan(
-                      text: ' predictable.',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: AppColors.textFor(context),
-                            fontWeight: FontWeight.w400,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _WhoAreWeFrame extends StatelessWidget {
-  const _WhoAreWeFrame();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Text(
-            'who\nare\nwe?',
-            style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                  color: AppColors.curveRed,
-                  fontSize: 62,
-                  height: 0.9,
-                  fontWeight: FontWeight.w800,
-                ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text.rich(
-                const TextSpan(
-                  children: <InlineSpan>[
-                    TextSpan(text: 'in a world where brands follow the '),
-                    TextSpan(
-                      text: 'same',
-                      style: TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                    TextSpan(text: ' paths'),
-                  ],
-                ),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.textFor(context),
-                    ),
-              ),
-              const SizedBox(height: 10),
-              Container(
-                width: 64,
-                height: 1.2,
-                color: AppColors.curveRed,
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
