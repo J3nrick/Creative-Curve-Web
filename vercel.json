@@ -1,7 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "if [ ! -d \"$HOME/flutter\" ]; then git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter; fi; export PATH=\"$HOME/flutter/bin:$PATH\"; flutter --version",
-  "buildCommand": "export PATH=\"$HOME/flutter/bin:$PATH\"; flutter config --enable-web; flutter pub get; flutter build web --release",
+  "framework": null,
+  "installCommand": "echo 'Skipping default install step'",
+  "buildCommand": "bash ./vercel-build.sh",
   "outputDirectory": "build/web",
   "rewrites": [
     {
