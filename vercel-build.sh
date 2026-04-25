@@ -8,8 +8,14 @@ if [ ! -d "$FLUTTER_DIR" ]; then
 fi
 
 export PATH="$FLUTTER_DIR/bin:$PATH"
+export CI=true
+
+flutter config --no-analytics || true
+dart --disable-analytics || true
 
 flutter --version
 flutter config --enable-web
+flutter doctor -v
 flutter pub get
+flutter precache --web
 flutter build web --release --base-href /
