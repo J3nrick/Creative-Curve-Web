@@ -1,5 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:creative_curve_web/features/contact_modal/presentation/contact_modal_screen.dart';
+import 'package:creative_curve_web/features/gallery/presentation/gallery_screen.dart';
 import 'package:creative_curve_web/features/home/presentation/home_screen.dart';
 import 'package:creative_curve_web/features/performance/presentation/performance_screen.dart';
 import 'package:creative_curve_web/features/service_grid/presentation/service_grid_screen.dart';
@@ -28,6 +29,13 @@ final GoRouter appRouter = GoRouter(
           name: 'services',
           pageBuilder: (BuildContext context, GoRouterState state) {
             return _sharedAxisPage(state, const ServiceGridScreen());
+          },
+        ),
+        GoRoute(
+          path: '/gallery',
+          name: 'gallery',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return _sharedAxisPage(state, const GalleryScreen());
           },
         ),
         GoRoute(

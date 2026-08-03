@@ -24,6 +24,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       <({String label, String path})>[
     (label: 'Home', path: '/'),
     (label: 'Services', path: '/services'),
+    (label: 'Gallery', path: '/gallery'),
     (label: 'Team', path: '/team'),
     (label: 'Performance', path: '/performance'),
     (label: 'Tools', path: '/tools'),

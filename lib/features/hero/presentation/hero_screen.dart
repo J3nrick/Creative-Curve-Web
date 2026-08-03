@@ -1,9 +1,11 @@
 import 'package:creative_curve_web/core/constants/app_colors.dart';
 import 'package:creative_curve_web/features/hero/application/hero_scroll_state.dart';
+import 'package:creative_curve_web/shared/layout/responsive_layout.dart';
 import 'package:creative_curve_web/shared/widgets/curve_logo.dart';
 import 'package:creative_curve_web/shared/widgets/mac_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class HeroScreen extends ConsumerStatefulWidget {
   const HeroScreen({super.key});
@@ -192,65 +194,189 @@ class _BrandPlaceholder extends StatelessWidget {
 class _FeaturedPreview extends StatelessWidget {
   const _FeaturedPreview();
 
+  static const List<({String path, String title, String category})> _items =
+      <({String path, String title, String category})>[
+    (
+      path: 'assets/gallery/01_lifestyle_grid.png',
+      title: 'Lifestyle & Product Stories',
+      category: 'Photography',
+    ),
+    (
+      path: 'assets/gallery/02_food_grid.png',
+      title: 'Culinary Visual Systems',
+      category: 'Food',
+    ),
+    (
+      path: 'assets/gallery/07_team_group.png',
+      title: 'We Take the Curve',
+      category: 'Studio',
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final bool compact = MediaQuery.sizeOf(context).width < 800;
+    final int columns = ResponsiveLayout.columnsFor(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: <Widget>[
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Featured Work', style: Theme.of(context).textTheme.headlineMedium),
-            TextButton(onPressed: () {}, child: const Text('View All Projects →')),
+          children: <Widget>[
+            Text(
+              'Featured Work',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    color: AppColors.textFor(context),
+                  ),
+            ),
+            TextButton(
+              onPressed: () => context.go('/gallery'),
+              child: const Text('View All Projects →'),
+            ),
           ],
         ),
-        const SizedBox(height: 32),
-        if (compact)
-          const Column(
-            children: [
-              _WorkCard(title: 'Cyber-Identity 2025', category: 'Branding'),
-              SizedBox(height: 16),
-              _WorkCard(title: 'Minimalist Motion', category: 'VFX'),
-            ],
-          )
-        else
-          const Row(
-            children: [
-              Expanded(child: _WorkCard(title: 'Cyber-Identity 2025', category: 'Branding')),
-              SizedBox(width: 24),
-              Expanded(child: _WorkCard(title: 'Minimalist Motion', category: 'VFX')),
-            ],
-          ),
+        SizedBox(height: ResponsiveLayout.space(4)),
+        LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final double gap = ResponsiveLayout.space(3);
+            final int cols = columns.clamp(1, 3);
+            final double tileWidth =
+                (constraints.maxWidth - gap * (cols - 1)) / cols;
+
+            return Wrap(
+              spacing: gap,
+              runSpacing: gap,
+              children: _items.map((item) {
+                return SizedBox(
+                  width: cols == 1 ? constraints.maxWidth : tileWidth,
+                  child: _WorkCard(
+                    path: item.path,
+                    title: item.title,
+                    category: item.category,
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        ),
       ],
     );
   }
 }
 
-class _WorkCard extends StatelessWidget {
-  const _WorkCard({required this.title, required this.category});
+class _WorkCard extends StatefulWidget {
+  const _WorkCard({
+    required this.path,
+    required this.title,
+    required this.category,
+  });
+
+  final String path;
   final String title;
   final String category;
 
   @override
+  State<_WorkCard> createState() => _WorkCardState();
+}
+
+class _WorkCardState extends State<_WorkCard> {
+  bool _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            height: 300,
-            width: double.infinity,
-            color: AppColors.mutedFor(context).withValues(alpha: 0.1),
-            child: const Icon(Icons.image_outlined, size: 48),
-          ),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeOutCubic,
+        scale: _hovered ? 1.02 : 1,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            AspectRatio(
+              aspectRatio: 4 / 3,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        boxShadow: <BoxShadow>[
+                          BoxShadow(
+                            color: AppColors.curveRed.withValues(alpha: 0.12),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Image.asset(
+                      widget.path,
+                      fit: BoxFit.cover,
+                      filterQuality: FilterQuality.high,
+                      frameBuilder: (
+                        BuildContext context,
+                        Widget child,
+                        int? frame,
+                        bool wasSynchronouslyLoaded,
+                      ) {
+                        if (wasSynchronouslyLoaded || frame != null) {
+                          return AnimatedOpacity(
+                            opacity: 1,
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeOutCubic,
+                            child: child,
+                          );
+                        }
+                        return ColoredBox(
+                          color: AppColors.mutedFor(context)
+                              .withValues(alpha: 0.1),
+                        );
+                      },
+                      errorBuilder: (_, __, ___) => ColoredBox(
+                        color:
+                            AppColors.mutedFor(context).withValues(alpha: 0.1),
+                        child: Icon(
+                          Icons.image_outlined,
+                          size: 48,
+                          color: AppColors.mutedFor(context),
+                        ),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Colors.white.withValues(
+                              alpha: AppColors.isDark(context) ? 0.18 : 0.4,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: ResponsiveLayout.space(2)),
+            Text(
+              widget.category,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: AppColors.curveRed,
+                  ),
+            ),
+            Text(
+              widget.title,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: AppColors.textFor(context),
+                  ),
+            ),
+          ],
         ),
-        const SizedBox(height: 16),
-        Text(category, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.curveRed)),
-        Text(title, style: Theme.of(context).textTheme.titleLarge),
-      ],
+      ),
     );
   }
 }

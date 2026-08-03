@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:creative_curve_web/core/constants/app_assets.dart';
 import 'package:creative_curve_web/core/constants/app_colors.dart';
 import 'package:creative_curve_web/shared/layout/responsive_layout.dart';
 import 'package:figma_squircle/figma_squircle.dart';
@@ -245,10 +246,10 @@ class _HeroVisualDeckState extends State<_HeroVisualDeck> {
   static const Duration _transitionDuration = Duration(milliseconds: 950);
 
   static const List<String> _images = <String>[
-    'assets/Home1.png',
-    'assets/Home2.png',
-    'assets/Home3.png',
-    'assets/Home4.png',
+    AppAssets.galleryHeroHome1,
+    AppAssets.galleryHeroHome2,
+    AppAssets.galleryHeroHome3,
+    AppAssets.galleryHeroHome4,
   ];
 
   late final Timer _timer;

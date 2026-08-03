@@ -1,194 +1,219 @@
 import 'package:creative_curve_web/core/constants/app_colors.dart';
 import 'package:creative_curve_web/shared/layout/responsive_layout.dart';
+import 'package:creative_curve_web/shared/widgets/liquid_glass_panel.dart';
 import 'package:flutter/material.dart';
 
 class ToolsScreen extends StatelessWidget {
   const ToolsScreen({super.key});
 
-  static const List<({String name, String imageUrl, Color tone})> _tools =
-      <({String name, String imageUrl, Color tone})>[
+  static const List<({String name, String imageUrl})> _tools =
+      <({String name, String imageUrl})>[
     (
       name: 'Google Workspace',
       imageUrl: 'https://img.icons8.com/color/512/google-logo.png',
-      tone: Color(0xFFF7FAFF),
     ),
     (
       name: 'Adobe Photoshop',
       imageUrl: 'https://dl.svgcdn.com/png/logos/adobe-photoshop-800.png',
-      tone: Color(0xFFF4F8FF),
     ),
     (
       name: 'Adobe Illustrator',
       imageUrl: 'https://dl.svgcdn.com/png/logos/adobe-illustrator-800.png',
-      tone: Color(0xFFFFF8F0),
     ),
     (
       name: 'Adobe Lightroom',
       imageUrl: 'https://dl.svgcdn.com/png/logos/adobe-lightroom-800.png',
-      tone: Color(0xFFF4F9FF),
     ),
     (
       name: 'Adobe Premiere Pro',
-      imageUrl: 'https://dl.svgcdn.com/png/streamline-logos/adobe-premiere-pro-logo-800.png',
-      tone: Color(0xFFF8F5FF),
+      imageUrl:
+          'https://dl.svgcdn.com/png/streamline-logos/adobe-premiere-pro-logo-800.png',
     ),
     (
       name: 'DaVinci Resolve',
-      imageUrl: 'https://img.icons8.com/color/512/adobe-premiere-pro.png',
-      tone: Color(0xFFF3FAFF),
+      imageUrl: 'https://img.icons8.com/color/512/davinci-resolve.png',
     ),
     (
       name: 'Procreate',
-      imageUrl: 'https://img.icons8.com/color/512/davinci-resolve.png',
-      tone: Color(0xFFFFF5F8),
+      imageUrl: 'https://img.icons8.com/color/512/procreate.png',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final bool isMobile = ResponsiveLayout.isMobile(context);
-    final bool isTablet = ResponsiveLayout.isTablet(context);
-
-    final int columns = isMobile
-        ? 1
-        : isTablet
-            ? 2
-            : 3;
+    final int columns = ResponsiveLayout.columnsFor(context);
 
     return SingleChildScrollView(
-      physics:
-          const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-            isMobile ? 18 : 56, isMobile ? 24 : 36, isMobile ? 18 : 56, 44),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Tools',
-              style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    color: AppColors.textFor(context),
-                  ),
-            ),
-            const SizedBox(height: 10),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 760),
-              child: Text(
-                'Our production stack is visual-first and built for speed, consistency, and high-quality delivery.',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge
-                    ?.copyWith(color: AppColors.mutedFor(context)),
+      physics: const BouncingScrollPhysics(
+        parent: AlwaysScrollableScrollPhysics(),
+      ),
+      child: ContentConstraint(
+        child: Padding(
+          padding: ResponsiveLayout.pagePadding(context),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'Tools',
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                      color: AppColors.textFor(context),
+                    ),
               ),
-            ),
-            const SizedBox(height: 20),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _tools.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: columns,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: columns == 1 ? 2.8 : 1.35,
+              SizedBox(height: ResponsiveLayout.space(1.25)),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 760),
+                child: Text(
+                  'Our production stack is visual-first and built for speed, consistency, and high-quality delivery.',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: AppColors.mutedFor(context),
+                      ),
+                ),
               ),
-              itemBuilder: (BuildContext context, int index) {
-                final item = _tools[index];
-                return _ToolCard(
-                  name: item.name,
-                  imageUrl: item.imageUrl,
-                  tone: item.tone,
-                );
-              },
-            ),
-          ],
+              SizedBox(height: ResponsiveLayout.space(3)),
+              LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  final double gap = ResponsiveLayout.space(2);
+                  final double tileWidth =
+                      (constraints.maxWidth - gap * (columns - 1)) / columns;
+                  final double aspect = columns == 1 ? 3.2 : 2.1;
+
+                  return Wrap(
+                    spacing: gap,
+                    runSpacing: gap,
+                    children: List<Widget>.generate(_tools.length, (int i) {
+                      final item = _tools[i];
+                      return SizedBox(
+                        width: columns == 1 ? constraints.maxWidth : tileWidth,
+                        child: AspectRatio(
+                          aspectRatio: aspect,
+                          child: _ToolGlassTile(
+                            name: item.name,
+                            imageUrl: item.imageUrl,
+                          ),
+                        ),
+                      );
+                    }),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _ToolCard extends StatefulWidget {
-  const _ToolCard({
+class _ToolGlassTile extends StatelessWidget {
+  const _ToolGlassTile({
     required this.name,
     required this.imageUrl,
-    required this.tone,
   });
 
   final String name;
   final String imageUrl;
-  final Color tone;
-
-  @override
-  State<_ToolCard> createState() => _ToolCardState();
-}
-
-class _ToolCardState extends State<_ToolCard> {
-  bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = AppColors.isDark(context);
+    final bool dark = AppColors.isDark(context);
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-        transform: Matrix4.translationValues(0.0, _hovered ? -4.0 : 0.0, 0.0),
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.elevatedSurfaceFor(context) : widget.tone,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.strokeFor(context)),
-          boxShadow: _hovered
-              ? <BoxShadow>[
-                  BoxShadow(
-                    color: AppColors.curveRed.withValues(alpha: 0.1),
-                    blurRadius: 16,
-                    offset: const Offset(0, 8),
-                  ),
-                ]
-              : const <BoxShadow>[],
-        ),
-        child: Row(
-          children: <Widget>[
-            Container(
-              width: 58,
-              height: 58,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceDark : Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.strokeFor(context)),
-              ),
-              child: Image.network(
-                widget.imageUrl,
-                width: 36,
-                height: 36,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(
-                    Icons.widgets_outlined,
-                    color: AppColors.textFor(context).withValues(alpha: 0.5),
+    return LiquidGlassPanel(
+      padding: EdgeInsets.all(ResponsiveLayout.space(2)),
+      child: Row(
+        children: <Widget>[
+          _FrostedIconBackdrop(
+            child: Image.network(
+              imageUrl,
+              width: 36,
+              height: 36,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.high,
+              frameBuilder: (
+                BuildContext context,
+                Widget child,
+                int? frame,
+                bool wasSynchronouslyLoaded,
+              ) {
+                if (wasSynchronouslyLoaded || frame != null) {
+                  return AnimatedOpacity(
+                    opacity: 1,
+                    duration: const Duration(milliseconds: 320),
+                    curve: Curves.easeOutCubic,
+                    child: child,
                   );
-                },
-              ),
+                }
+                return SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.curveRed.withValues(alpha: 0.6),
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(
+                  Icons.widgets_outlined,
+                  color: AppColors.textFor(context).withValues(alpha: 0.45),
+                );
+              },
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                widget.name,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textFor(context), // Fixed: Text adapts to theme
-                    ),
-              ),
+          ),
+          SizedBox(width: ResponsiveLayout.space(1.5)),
+          Expanded(
+            child: Text(
+              name,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textFor(context),
+                  ),
             ),
-          ],
-        ),
+          ),
+          Icon(
+            Icons.arrow_outward_rounded,
+            size: 18,
+            color: dark
+                ? AppColors.mutedFor(context).withValues(alpha: 0.7)
+                : AppColors.mutedFor(context),
+          ),
+        ],
       ),
+    );
+  }
+}
+
+class _FrostedIconBackdrop extends StatelessWidget {
+  const _FrostedIconBackdrop({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool dark = AppColors.isDark(context);
+
+    return Container(
+      width: 58,
+      height: 58,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        color: dark
+            ? Colors.white.withValues(alpha: 0.08)
+            : Colors.white.withValues(alpha: 0.72),
+        border: Border.all(
+          color: dark
+              ? Colors.white.withValues(alpha: 0.18)
+              : Colors.white.withValues(alpha: 0.9),
+        ),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: AppColors.curveRed.withValues(alpha: 0.1),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: child,
     );
   }
 }
