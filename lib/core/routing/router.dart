@@ -2,10 +2,8 @@ import 'package:animations/animations.dart';
 import 'package:creative_curve_web/features/contact_modal/presentation/contact_modal_screen.dart';
 import 'package:creative_curve_web/features/gallery/presentation/gallery_screen.dart';
 import 'package:creative_curve_web/features/home/presentation/home_screen.dart';
-import 'package:creative_curve_web/features/performance/presentation/performance_screen.dart';
 import 'package:creative_curve_web/features/service_grid/presentation/service_grid_screen.dart';
 import 'package:creative_curve_web/features/team/presentation/team_screen.dart';
-import 'package:creative_curve_web/features/tools/presentation/tools_screen.dart';
 import 'package:creative_curve_web/shared/layout/main_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -43,20 +41,6 @@ final GoRouter appRouter = GoRouter(
           name: 'team',
           pageBuilder: (BuildContext context, GoRouterState state) {
             return _sharedAxisPage(state, const TeamScreen());
-          },
-        ),
-        GoRoute(
-          path: '/performance',
-          name: 'performance',
-          pageBuilder: (BuildContext context, GoRouterState state) {
-            return _sharedAxisPage(state, const PerformanceScreen());
-          },
-        ),
-        GoRoute(
-          path: '/tools',
-          name: 'tools',
-          pageBuilder: (BuildContext context, GoRouterState state) {
-            return _sharedAxisPage(state, const ToolsScreen());
           },
         ),
         GoRoute(

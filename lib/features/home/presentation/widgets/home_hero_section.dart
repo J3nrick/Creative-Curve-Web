@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:creative_curve_web/core/constants/app_assets.dart';
 import 'package:creative_curve_web/core/constants/app_colors.dart';
@@ -190,7 +191,12 @@ class _HeroVisual extends StatelessWidget {
             cornerRadius: 26,
             cornerSmoothing: 0.6,
           ),
-          side: BorderSide(color: AppColors.strokeFor(context)),
+          side: BorderSide(
+            color: Colors.white.withValues(
+              alpha: AppColors.isDark(context) ? 0.15 : 0.3,
+            ),
+            width: 1.5,
+          ),
         ),
         gradient: AppColors.isDark(context)
             ? const LinearGradient(
@@ -206,6 +212,21 @@ class _HeroVisual extends StatelessWidget {
       ),
       child: Stack(
         children: <Widget>[
+          // BACKDROP BLUR EFFECT (Liquid Glass)
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.isDark(context)
+                      ? Colors.white.withValues(alpha: 0.02)
+                      : Colors.black.withValues(alpha: 0.02),
+                  borderRadius: BorderRadius.circular(26),
+                ),
+              ),
+            ),
+          ),
+          // AMBIENT GLOW ORBS
           Positioned(
             top: -40,
             right: -35,
@@ -222,6 +243,7 @@ class _HeroVisual extends StatelessWidget {
               color: AppColors.textFor(context).withValues(alpha: 0.06),
             ),
           ),
+          // CONTENT
           Positioned.fill(
             child: Padding(
               padding: const EdgeInsets.all(12),
@@ -341,20 +363,34 @@ class _HeroVisualDeckState extends State<_HeroVisualDeck> {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
+          // CAROUSEL INDICATORS
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: List<Widget>.generate(_images.length, (int i) {
               final bool active = i == _index;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 260),
-                margin: const EdgeInsets.only(right: 6),
-                width: active ? 22 : 8,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: active
-                      ? AppColors.curveRed
-                      : AppColors.textFor(context).withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(999),
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutCubic,
+                  width: active ? 24 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: active
+                        ? AppColors.curveRed
+                        : AppColors.textFor(context).withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(999),
+                    boxShadow: active
+                        ? [
+                            BoxShadow(
+                              color: AppColors.curveRed.withValues(alpha: 0.4),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                        : [],
+                  ),
                 ),
               );
             }),

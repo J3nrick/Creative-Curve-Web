@@ -3,6 +3,7 @@ import 'package:creative_curve_web/features/hero/application/hero_scroll_state.d
 import 'package:creative_curve_web/shared/layout/responsive_layout.dart';
 import 'package:creative_curve_web/shared/widgets/curve_logo.dart';
 import 'package:creative_curve_web/shared/widgets/mac_cached_image.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -42,37 +43,48 @@ class _HeroScreenState extends ConsumerState<HeroScreen> {
     final bool compact = MediaQuery.sizeOf(context).width < 980;
     final double horizontalPadding = compact ? 24 : 56;
 
-    return CustomScrollView(
-      controller: _scrollController,
-      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-      slivers: <Widget>[
-        // HERO SECTION
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: horizontalPadding,
-              vertical: compact ? 40 : 80,
+    return Stack(
+      children: [
+        CustomScrollView(
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          slivers: <Widget>[
+            // HERO SECTION
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: compact ? 40 : 80,
+                ),
+                child: compact ? const _HeroCompact() : const _HeroDesktop(),
+              ),
             ),
-            child: compact ? const _HeroCompact() : const _HeroDesktop(),
-          ),
-        ),
 
-        // TRUST BAR (Client Logos / Social Proof)
-        SliverToBoxAdapter(child: _TrustBar(horizontalPadding: horizontalPadding)),
+            // TRUST & IMPACT BAR
+            SliverToBoxAdapter(child: _TrustBar(horizontalPadding: horizontalPadding)),
 
-        // FEATURED WORK SECTION
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: horizontalPadding,
-              vertical: 80,
+            // FEATURED WORK SECTION
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: 80,
+                ),
+                child: const _FeaturedPreview(),
+              ),
             ),
-            child: const _FeaturedPreview(),
-          ),
-        ),
 
-        // ADD BOTTOM PADDING
-        const SliverPadding(padding: EdgeInsets.only(bottom: 100)),
+            // ADD BOTTOM PADDING
+            const SliverPadding(padding: EdgeInsets.only(bottom: 100)),
+          ],
+        ),
+        // FLOATING SCROLL INDICATOR
+        const Positioned(
+          bottom: 24,
+          left: 0,
+          right: 0,
+          child: Center(child: _ScrollDownIndicator()),
+        ),
       ],
     );
   }
@@ -144,7 +156,7 @@ class _TrustBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 40, horizontal: horizontalPadding),
+      padding: EdgeInsets.symmetric(vertical: 48, horizontal: horizontalPadding),
       color: AppColors.isDark(context) ? Colors.white.withValues(alpha: 0.02) : Colors.black.withValues(alpha: 0.02),
       child: Column(
         children: [
@@ -167,6 +179,27 @@ class _TrustBar extends StatelessWidget {
               _BrandPlaceholder(name: 'NEXUS'),
             ],
           ),
+          const SizedBox(height: 48),
+          // IMPACT METRICS
+          const Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 32,
+            runSpacing: 24,
+            children: <Widget>[
+              _ImpactMetric(
+                metric: '50+',
+                label: 'Projects Delivered',
+              ),
+              _ImpactMetric(
+                metric: '100%',
+                label: 'On-Time Completion',
+              ),
+              _ImpactMetric(
+                metric: '12+',
+                label: 'Years Experience',
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -185,6 +218,42 @@ class _BrandPlaceholder extends StatelessWidget {
         fontWeight: FontWeight.w900,
         color: AppColors.mutedFor(context).withValues(alpha: 0.4),
       ),
+    );
+  }
+}
+
+// --- IMPACT METRIC ---
+
+class _ImpactMetric extends StatelessWidget {
+  const _ImpactMetric({
+    required this.metric,
+    required this.label,
+  });
+
+  final String metric;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          metric,
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            color: AppColors.curveRed,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            color: AppColors.mutedFor(context),
+            letterSpacing: 0.5,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -393,7 +462,8 @@ class _EditorialCopy extends StatefulWidget {
 }
 
 class _EditorialCopyState extends State<_EditorialCopy> {
-  bool _hovered = false;
+  bool _primaryHovered = false;
+  bool _secondaryHovered = false;
 
   @override
   Widget build(BuildContext context) {
@@ -405,47 +475,176 @@ class _EditorialCopyState extends State<_EditorialCopy> {
       children: <Widget>[
         const CurveLogo(height: 42, semanticLabel: 'Creative Curve logo'),
         const SizedBox(height: 12),
-        Text(widget.subtitle, style: textTheme.labelLarge?.copyWith(color: AppColors.mutedFor(context))),
-        const SizedBox(height: 16),
+        Text(
+          widget.subtitle,
+          style: textTheme.labelLarge?.copyWith(
+            color: AppColors.mutedFor(context),
+          ),
+        ),
+        const SizedBox(height: 24),
+        // DISPLAY HEADING WITH FIXED LINE-HEIGHT
         Text(
           widget.title,
           style: textTheme.displayLarge?.copyWith(
             fontWeight: FontWeight.w900,
-            height: 1.1,
+            height: 1.15, // Fixed line-height to prevent descender overlap
+            letterSpacing: -0.5,
             color: AppColors.textFor(context),
           ),
         ),
-        const SizedBox(height: 32),
-        MouseRegion(
-          cursor: SystemMouseCursors.click,
-          onEnter: (_) => setState(() => _hovered = true),
-          onExit: (_) => setState(() => _hovered = false),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeOutCubic,
-            transform: Matrix4.translationValues(0, _hovered ? -4 : 0, 0),
-            decoration: BoxDecoration(
-              color: _hovered ? AppColors.curveRed : AppColors.charcoal,
-              borderRadius: BorderRadius.circular(999),
-              boxShadow: _hovered
-                  ? [
-                      BoxShadow(
-                        color: AppColors.curveRed.withValues(alpha: 0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ]
-                  : [],
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
-            child: Text(
-              'VIEW THE CURVE DECK',
-              style: textTheme.bodyMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 2.0,
+        const SizedBox(height: 40),
+        // BUTTON HIERARCHY: PRIMARY + SECONDARY
+        Wrap(
+          spacing: 16,
+          runSpacing: 12,
+          children: <Widget>[
+            // PRIMARY BUTTON - RED CTA
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              onEnter: (_) => setState(() => _primaryHovered = true),
+              onExit: (_) => setState(() => _primaryHovered = false),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                transform: Matrix4.translationValues(0, _primaryHovered ? -6 : 0, 0),
+                decoration: BoxDecoration(
+                  color: AppColors.curveRed,
+                  borderRadius: BorderRadius.circular(999),
+                  boxShadow: _primaryHovered
+                      ? [
+                          BoxShadow(
+                            color: AppColors.curveRed.withValues(alpha: 0.4),
+                            blurRadius: 28,
+                            offset: const Offset(0, 12),
+                          ),
+                        ]
+                      : [
+                          BoxShadow(
+                            color: AppColors.curveRed.withValues(alpha: 0.25),
+                            blurRadius: 16,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                child: GestureDetector(
+                  onTap: () => context.go('/services'),
+                  child: Text(
+                    'View Services',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
               ),
             ),
+            // SECONDARY BUTTON - GLASS STROKE
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              onEnter: (_) => setState(() => _secondaryHovered = true),
+              onExit: (_) => setState(() => _secondaryHovered = false),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                transform: Matrix4.translationValues(0, _secondaryHovered ? -6 : 0, 0),
+                decoration: ShapeDecoration(
+                  color: _secondaryHovered
+                      ? AppColors.textFor(context).withValues(alpha: 0.08)
+                      : AppColors.textFor(context).withValues(alpha: 0.04),
+                  shape: SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(
+                      cornerRadius: 16,
+                      cornerSmoothing: 0.6,
+                    ),
+                    side: BorderSide(
+                      color: AppColors.textFor(context).withValues(
+                        alpha: _secondaryHovered ? 0.3 : 0.15,
+                      ),
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                child: GestureDetector(
+                  onTap: () => context.go('/team'),
+                  child: Text(
+                    'Meet Team',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textFor(context),
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// --- SCROLL DOWN INDICATOR ---
+
+class _ScrollDownIndicator extends StatefulWidget {
+  const _ScrollDownIndicator();
+
+  @override
+  State<_ScrollDownIndicator> createState() => _ScrollDownIndicatorState();
+}
+
+class _ScrollDownIndicatorState extends State<_ScrollDownIndicator>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _animation = Tween<double>(begin: 0, end: 12).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Scroll Down',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: AppColors.mutedFor(context),
+            letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(height: 8),
+        AnimatedBuilder(
+          animation: _animation,
+          builder: (context, child) {
+            return Transform.translate(
+              offset: Offset(0, _animation.value),
+              child: child,
+            );
+          },
+          child: Icon(
+            Icons.arrow_downward_rounded,
+            size: 20,
+            color: AppColors.mutedFor(context).withValues(alpha: 0.6),
           ),
         ),
       ],

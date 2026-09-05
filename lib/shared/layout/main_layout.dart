@@ -26,8 +26,6 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     (label: 'Services', path: '/services'),
     (label: 'Gallery', path: '/gallery'),
     (label: 'Team', path: '/team'),
-    (label: 'Performance', path: '/performance'),
-    (label: 'Tools', path: '/tools'),
     (label: 'Contacts', path: '/contacts'),
   ];
 

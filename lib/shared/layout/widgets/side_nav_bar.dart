@@ -26,7 +26,7 @@ class SideNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 132,
+      width: 112,
       margin: const EdgeInsets.fromLTRB(14, 14, 10, 14),
       decoration: ShapeDecoration(
         color: AppColors.surfaceFor(context),
@@ -87,6 +87,9 @@ class SideNavBar extends StatelessWidget {
               },
             ),
           ),
+          const _StatusPill(),
+          const SizedBox(height: 8),
+          const _SocialIconButtons(),
           const SizedBox(height: 10),
         ],
       ),
@@ -165,3 +168,175 @@ class _SideNavButtonState extends State<_SideNavButton> {
     );
   }
 }
+
+// --- STATUS PILL ---
+
+class _StatusPill extends StatelessWidget {
+  const _StatusPill();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: ShapeDecoration(
+        color: AppColors.curveRed.withValues(alpha: 0.15),
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 12,
+            cornerSmoothing: 0.6,
+          ),
+          side: BorderSide(
+            color: AppColors.curveRed.withValues(alpha: 0.5),
+          ),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                '🟢',
+                style: TextStyle(fontSize: 12),
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  'Available',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.curveRed,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 10,
+                      ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'New Projects',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.curveRed.withValues(alpha: 0.7),
+                  fontSize: 9,
+                ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// --- SOCIAL ICON BUTTONS ---
+
+class _SocialIconButtons extends StatelessWidget {
+  const _SocialIconButtons();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 6,
+        runSpacing: 6,
+        children: [
+          _SocialIconButton(
+            icon: Icons.link_rounded,
+            tooltip: 'LinkedIn',
+            onPressed: () {
+              // TODO: Add LinkedIn URL
+            },
+          ),
+          _SocialIconButton(
+            icon: Icons.language_rounded,
+            tooltip: 'X (Twitter)',
+            onPressed: () {
+              // TODO: Add Twitter/X URL
+            },
+          ),
+          _SocialIconButton(
+            icon: Icons.camera_alt_rounded,
+            tooltip: 'Instagram',
+            onPressed: () {
+              // TODO: Add Instagram URL
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SocialIconButton extends StatefulWidget {
+  const _SocialIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onPressed;
+
+  @override
+  State<_SocialIconButton> createState() => _SocialIconButtonState();
+}
+
+class _SocialIconButtonState extends State<_SocialIconButton> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        decoration: ShapeDecoration(
+          color: _hovered
+              ? AppColors.textFor(context).withValues(alpha: 0.08)
+              : Colors.transparent,
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 10,
+              cornerSmoothing: 0.6,
+            ),
+            side: BorderSide(
+              color: _hovered
+                  ? AppColors.textFor(context).withValues(alpha: 0.2)
+                  : AppColors.strokeFor(context),
+            ),
+          ),
+        ),
+        child: Tooltip(
+          message: widget.tooltip,
+          child: IconButton(
+            onPressed: widget.onPressed,
+            iconSize: 18,
+            splashColor: Colors.transparent,
+            hoverColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              padding: const EdgeInsets.all(6),
+              minimumSize: const Size(32, 32),
+            ),
+            icon: Icon(
+              widget.icon,
+              color: AppColors.mutedFor(context),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
