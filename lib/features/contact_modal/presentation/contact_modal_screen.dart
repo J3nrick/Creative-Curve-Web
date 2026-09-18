@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:creative_curve_web/core/constants/app_colors.dart';
 import 'package:creative_curve_web/shared/layout/responsive_layout.dart';
 import 'package:creative_curve_web/shared/widgets/curve_logo.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 
 class ContactModalScreen extends StatefulWidget {
@@ -35,9 +36,9 @@ class _ContactModalScreenState extends State<ContactModalScreen> {
         const _AtmosphereBackground(),
         LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-            final double targetWidth = compact ? 540 : 680;
+            final double targetWidth = compact ? 520 : 640;
             final double panelWidth =
-                (constraints.maxWidth - (compact ? 36 : 56))
+                (constraints.maxWidth - (compact ? 32 : 56))
                     .clamp(280, targetWidth)
                     .toDouble();
 
@@ -47,8 +48,8 @@ class _ContactModalScreenState extends State<ContactModalScreen> {
                   parent: AlwaysScrollableScrollPhysics(),
                 ),
                 padding: EdgeInsets.symmetric(
-                  horizontal: compact ? 18 : 28,
-                  vertical: compact ? 22 : 30,
+                  horizontal: compact ? 16 : 24,
+                  vertical: compact ? 20 : 28,
                 ),
                 child: _LuxGlassModal(
                   width: panelWidth,
@@ -57,28 +58,28 @@ class _ContactModalScreenState extends State<ContactModalScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       const _PanelHeader(),
-                      SizedBox(height: ResponsiveLayout.space(2.75)),
+                      SizedBox(height: ResponsiveLayout.space(2.5)),
                       _Field(
-                        label: 'Name',
-                        hint: 'Who should we thank for this inquiry?',
+                        label: 'Your Name',
+                        hint: 'What should we call you?',
                         controller: _nameController,
                       ),
                       SizedBox(height: ResponsiveLayout.space(1.5)),
                       _Field(
-                        label: 'Email',
-                        hint: 'Where do we send the curve deck?',
+                        label: 'Work Email',
+                        hint: 'Where can we send the brief & deck?',
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                       ),
                       SizedBox(height: ResponsiveLayout.space(1.5)),
                       _Field(
-                        label: 'Project Brief',
+                        label: 'Project Scope & Goals',
                         hint:
-                            'Tell us what you are building and what success looks like.',
+                            'Tell us about your brand, timeline, and what breakthrough looks like.',
                         controller: _messageController,
-                        maxLines: 5,
+                        maxLines: 4,
                       ),
-                      SizedBox(height: ResponsiveLayout.space(2)),
+                      SizedBox(height: ResponsiveLayout.space(2.5)),
                       SizedBox(
                         width: double.infinity,
                         height: 48,
@@ -87,12 +88,12 @@ class _ContactModalScreenState extends State<ContactModalScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text(
-                                  'Thanks. We will reach out shortly.',
+                                  'Inquiry received. We will get in touch shortly.',
                                 ),
                               ),
                             );
                           },
-                          child: const Text('Send Message'),
+                          child: const Text('Send Project Brief'),
                         ),
                       ),
                     ],
@@ -121,83 +122,51 @@ class _LuxGlassModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool dark = AppColors.isDark(context);
-    final BorderRadius radius = BorderRadius.circular(28);
+    final SmoothBorderRadius radius = SmoothBorderRadius(
+      cornerRadius: 26,
+      cornerSmoothing: 0.6,
+    );
 
     return Container(
       width: width,
-      decoration: BoxDecoration(
-        borderRadius: radius,
-        boxShadow: <BoxShadow>[
+      decoration: ShapeDecoration(
+        color: dark
+            ? const Color(0xFF141418).withValues(alpha: 0.92)
+            : Colors.white.withValues(alpha: 0.92),
+        shape: SmoothRectangleBorder(
+          borderRadius: radius,
+          side: BorderSide(
+            color: dark
+                ? Colors.white.withValues(alpha: 0.14)
+                : Colors.black.withValues(alpha: 0.08),
+            width: 1.0,
+          ),
+        ),
+        shadows: <BoxShadow>[
           BoxShadow(
-            color: AppColors.curveRed.withValues(alpha: 0.16),
-            blurRadius: 48,
-            offset: const Offset(0, 22),
+            color: Colors.black.withValues(alpha: dark ? 0.4 : 0.08),
+            blurRadius: 36,
+            offset: const Offset(0, 16),
           ),
           BoxShadow(
-            color: Colors.black.withValues(alpha: dark ? 0.42 : 0.14),
-            blurRadius: 40,
-            offset: const Offset(0, 18),
+            color: AppColors.curveRed.withValues(alpha: dark ? 0.08 : 0.04),
+            blurRadius: 28,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: radius,
+      child: ClipSmoothRect(
+        radius: radius,
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: radius,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: dark
-                    ? <Color>[
-                        AppColors.surfaceDark.withValues(alpha: 0.88),
-                        const Color(0xFF1A1214).withValues(alpha: 0.82),
-                      ]
-                    : <Color>[
-                        Colors.white.withValues(alpha: 0.86),
-                        const Color(0xFFF8F4F4).withValues(alpha: 0.78),
-                      ],
-              ),
-              border: Border(
-                top: BorderSide(
-                  color: Colors.white.withValues(alpha: dark ? 0.28 : 0.9),
-                  width: 1.2,
-                ),
-                left: BorderSide(
-                  color: Colors.white.withValues(alpha: dark ? 0.16 : 0.55),
-                ),
-                right: BorderSide(
-                  color: AppColors.curveRed.withValues(alpha: 0.18),
-                ),
-                bottom: BorderSide(
-                  color: AppColors.curveRed.withValues(alpha: 0.35),
-                  width: 1.2,
-                ),
-              ),
+          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              compact ? 20 : 30,
+              compact ? 20 : 28,
+              compact ? 20 : 30,
+              compact ? 22 : 28,
             ),
-            child: Stack(
-              children: <Widget>[
-                Positioned(
-                  top: -40,
-                  right: -30,
-                  child: _GlowSphere(
-                    size: 160,
-                    color: AppColors.curveRed.withValues(alpha: 0.18),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    compact ? 18 : 26,
-                    compact ? 18 : 24,
-                    compact ? 18 : 26,
-                    24,
-                  ),
-                  child: child,
-                ),
-              ],
-            ),
+            child: child,
           ),
         ),
       ),
@@ -218,16 +187,17 @@ class _PanelHeader extends StatelessWidget {
       children: <Widget>[
         Expanded(
           child: CurveLogo(
-            height: 28,
+            height: 26,
             variant: variant,
             semanticLabel: 'Creative Curve logo',
           ),
         ),
         Text(
-          'Get Info',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          'Start A Project',
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: AppColors.mutedFor(context),
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
               ),
         ),
       ],
@@ -259,40 +229,48 @@ class _Field extends StatelessWidget {
       children: <Widget>[
         Text(
           label,
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: AppColors.textFor(context),
-                letterSpacing: 1,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.8,
               ),
         ),
-        SizedBox(height: ResponsiveLayout.space(1)),
+        const SizedBox(height: 6),
         TextField(
           controller: controller,
           maxLines: maxLines,
           keyboardType: keyboardType,
+          style: TextStyle(
+            color: AppColors.textFor(context),
+            fontSize: 14,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.mutedFor(context),
+                  color: AppColors.subtleFor(context),
+                  fontSize: 13.5,
                 ),
             filled: true,
             fillColor: dark
-                ? Colors.white.withValues(alpha: 0.06)
-                : Colors.white.withValues(alpha: 0.72),
+                ? const Color(0xFF1B1B20)
+                : const Color(0xFFF6F8FA),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide(color: AppColors.strokeFor(context)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(
-                color: Colors.white.withValues(alpha: dark ? 0.12 : 0.55),
-              ),
+              borderSide: BorderSide(color: AppColors.strokeFor(context)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: const BorderSide(
                 color: AppColors.curveRed,
-                width: 1.2,
+                width: 1.5,
               ),
             ),
           ),
@@ -311,86 +289,21 @@ class _AtmosphereBackground extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
+        color: AppColors.backgroundFor(context),
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
           colors: dark
               ? const <Color>[
-                  Color(0xFF0C0C0E),
-                  Color(0xFF141417),
-                  Color(0xFF1A1A1F),
+                  Color(0xFF09090B),
+                  Color(0xFF101014),
+                  Color(0xFF0D0D10),
                 ]
               : const <Color>[
-                  Color(0xFFF1F2F5),
-                  Color(0xFFE8ECEF),
-                  Color(0xFFDEE4EA),
+                  Color(0xFFF7F8FA),
+                  Color(0xFFEFF1F5),
+                  Color(0xFFE9ECF1),
                 ],
-        ),
-      ),
-      child: Stack(
-        children: <Widget>[
-          Positioned(
-            left: -120,
-            top: -90,
-            child: _GlowSphere(
-              size: 340,
-              color: AppColors.curveRed.withValues(alpha: dark ? 0.28 : 0.2),
-            ),
-          ),
-          Positioned(
-            right: -60,
-            top: 120,
-            child: _GlowSphere(
-              size: 220,
-              color: AppColors.curveRed.withValues(alpha: dark ? 0.14 : 0.1),
-            ),
-          ),
-          Positioned(
-            right: -80,
-            bottom: -120,
-            child: _GlowSphere(
-              size: 380,
-              color: (dark ? const Color(0xFF9AA8B5) : const Color(0xFF7A8A99))
-                  .withValues(alpha: 0.22),
-            ),
-          ),
-          Positioned(
-            left: 80,
-            bottom: 40,
-            child: _GlowSphere(
-              size: 160,
-              color: AppColors.curveRed.withValues(alpha: 0.1),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _GlowSphere extends StatelessWidget {
-  const _GlowSphere({required this.size, required this.color});
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipOval(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(
-              colors: <Color>[
-                color,
-                color.withValues(alpha: 0),
-              ],
-            ),
-          ),
         ),
       ),
     );

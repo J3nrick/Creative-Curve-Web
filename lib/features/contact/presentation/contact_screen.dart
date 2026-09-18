@@ -108,7 +108,7 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
                       padding: const EdgeInsets.only(top: 14),
                       child: Text(
                         formState.message!,
-                        style: const TextStyle(color: AppColors.electricBlue),
+                        style: const TextStyle(color: AppColors.curveRed, fontWeight: FontWeight.w600),
                       ),
                     ),
                 ],

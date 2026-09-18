@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:creative_curve_web/core/constants/app_assets.dart';
 import 'package:creative_curve_web/core/constants/app_colors.dart';
@@ -19,17 +18,17 @@ class HomeHeroSection extends StatelessWidget {
     final double horizontalPadding = isMobile
         ? 16
         : isTablet
-            ? 26
-            : 34;
+            ? 24
+            : 32;
 
-    final double topPadding = isMobile ? 10 : 18;
+    final double topPadding = isMobile ? 8 : 16;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
         horizontalPadding,
         topPadding,
         horizontalPadding,
-        isMobile ? 20 : 34,
+        isMobile ? 20 : 32,
       ),
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
@@ -38,42 +37,38 @@ class HomeHeroSection extends StatelessWidget {
           final double desktopHeight = constraints.maxWidth < 1180 ? 600 : 640;
 
           if (compact) {
-  return Container(
-    // Added width constraint to prevent horizontal stretching
-    width: double.infinity,
-    padding: EdgeInsets.all(tiny ? 16 : 24),
-    decoration: ShapeDecoration(
-      color: AppColors.surfaceFor(context),
-      shape: SmoothRectangleBorder(
-        borderRadius: SmoothBorderRadius(
-          cornerRadius: 24,
-          cornerSmoothing: 0.6,
-        ),
-        side: BorderSide(color: AppColors.strokeFor(context)),
-      ),
-    ),
-    // WRAP IN SCROLLVIEW TO FIX OVERFLOW
-    child: SingleChildScrollView(
-      physics: const NeverScrollableScrollPhysics(), // Keeps it feeling tight
-      child: Column(
-        mainAxisSize: MainAxisSize.min, // Vital: takes only needed space
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          const _HeroCopy(compact: true),
-          const SizedBox(height: 24),
-          // DYNAMIC VISUAL BOX
-          ConstrainedBox(
-            constraints: BoxConstraints(
-              // Allow the image to be smaller on tiny phones
-              maxHeight: tiny ? 180 : 250, 
-            ),
-            child: const _HeroVisualDeck(),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+            return Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(tiny ? 18 : 28),
+              decoration: ShapeDecoration(
+                color: AppColors.surfaceFor(context),
+                shape: SmoothRectangleBorder(
+                  borderRadius: SmoothBorderRadius(
+                    cornerRadius: 26,
+                    cornerSmoothing: 0.6,
+                  ),
+                  side: BorderSide(
+                    color: AppColors.strokeFor(context),
+                    width: 1.0,
+                  ),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  const _HeroCopy(compact: true),
+                  const SizedBox(height: 24),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: tiny ? 230 : 300,
+                    ),
+                    child: const _MacStudioDeck(),
+                  ),
+                ],
+              ),
+            );
+          }
 
           return SizedBox(
             height: desktopHeight,
@@ -85,27 +80,30 @@ class HomeHeroSection extends StatelessWidget {
                       color: AppColors.surfaceFor(context),
                       shape: SmoothRectangleBorder(
                         borderRadius: SmoothBorderRadius(
-                          cornerRadius: 30,
+                          cornerRadius: 28,
                           cornerSmoothing: 0.6,
                         ),
-                        side: BorderSide(color: AppColors.strokeFor(context)),
+                        side: BorderSide(
+                          color: AppColors.strokeFor(context),
+                          width: 1.0,
+                        ),
                       ),
                     ),
                   ),
                 ),
                 Positioned(
-                  left: 30,
-                  top: 30,
-                  bottom: 30,
-                  width: constraints.maxWidth * 0.58,
+                  left: 32,
+                  top: 32,
+                  bottom: 32,
+                  width: constraints.maxWidth * 0.54,
                   child: const _HeroCopy(compact: false),
                 ),
                 Positioned(
-                  right: 22,
-                  top: 22,
-                  bottom: 22,
-                  width: constraints.maxWidth * 0.38,
-                  child: const _HeroVisualDeck(),
+                  right: 24,
+                  top: 24,
+                  bottom: 24,
+                  width: constraints.maxWidth * 0.42,
+                  child: const _MacStudioDeck(),
                 ),
               ],
             ),
@@ -123,155 +121,158 @@ class _HeroCopy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = AppColors.isDark(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        ShaderMask(
-          shaderCallback: (Rect bounds) {
-            return const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: <Color>[Color(0xFFFF3B30), Color(0xFFF5F5F7)],
-            ).createShader(bounds);
-          },
-          child: Text(
-            'Designing momentum for brands that refuse straight lines.',
-            style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                  color: Colors.white,
-                  fontSize: compact ? 38 : 66,
-                  height: compact ? 1.04 : 0.95,
-                  letterSpacing: -1.1,
+        // Live Telemetry Badge (macOS pill style)
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: isDark
+                ? const Color(0xFF19191E)
+                : const Color(0xFFF1F3F6),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: AppColors.strokeFor(context),
+              width: 1.0,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 6,
+                height: 6,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFF34C759),
                 ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'LIVE STUDIO',
+                style: TextStyle(
+                  color: AppColors.mutedFor(context),
+                  fontWeight: FontWeight.w800,
+                  fontSize: 10,
+                  letterSpacing: 1.4,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 3,
+                height: 3,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.mutedFor(context).withValues(alpha: 0.5),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Q2 Project Intake Open',
+                style: TextStyle(
+                  color: AppColors.textFor(context),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 18),
+
+        // Main Headline
+        RichText(
+          text: TextSpan(
+            style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                  fontSize: compact ? 34 : 56,
+                  height: 1.04,
+                  letterSpacing: -1.3,
+                  color: AppColors.textFor(context),
+                ),
+            children: const <TextSpan>[
+              TextSpan(text: 'Designing strategic momentum for brands that '),
+              TextSpan(
+                text: 'refuse straight lines.',
+                style: TextStyle(color: AppColors.curveRed),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 16),
+
+        // Strategic Subtitle
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 620),
+          constraints: const BoxConstraints(maxWidth: 560),
           child: Text(
-            'Creative Curve Studios fuses strategic storytelling, visual systems, and performance engineering into one polished digital arc.',
+            'We fuse brand architecture, bespoke commercial visual production, and high-performance digital systems into category-defining momentum.',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: AppColors.mutedFor(context),
-                  height: 1.55,
+                  height: 1.5,
+                  fontSize: compact ? 14.5 : 16.5,
                 ),
           ),
         ),
-        const SizedBox(height: 22),
+        const SizedBox(height: 26),
+
+        // Action Buttons
         Wrap(
           spacing: 12,
           runSpacing: 10,
           children: <Widget>[
             _HeroActionButton(
-              label: 'View Services',
+              label: 'Explore Capabilities',
+              icon: Icons.arrow_forward_rounded,
               onTap: () => context.go('/services'),
             ),
             _HeroActionButton(
-              label: 'Meet Team',
+              label: 'Meet The Specialists',
               outlined: true,
               onTap: () => context.go('/team'),
             ),
           ],
         ),
-       
       ],
     );
   }
 }
 
-class _HeroVisual extends StatelessWidget {
-  const _HeroVisual({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: ShapeDecoration(
-        shape: SmoothRectangleBorder(
-          borderRadius: SmoothBorderRadius(
-            cornerRadius: 26,
-            cornerSmoothing: 0.6,
-          ),
-          side: BorderSide(
-            color: Colors.white.withValues(
-              alpha: AppColors.isDark(context) ? 0.15 : 0.3,
-            ),
-            width: 1.5,
-          ),
-        ),
-        gradient: AppColors.isDark(context)
-            ? const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: <Color>[Color(0xFF101012), Color(0xFF1A1314)],
-              )
-            : const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: <Color>[Color(0xFFECEFF3), Color(0xFFFDFDFE)],
-              ),
-      ),
-      child: Stack(
-        children: <Widget>[
-          // BACKDROP BLUR EFFECT (Liquid Glass)
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.isDark(context)
-                      ? Colors.white.withValues(alpha: 0.02)
-                      : Colors.black.withValues(alpha: 0.02),
-                  borderRadius: BorderRadius.circular(26),
-                ),
-              ),
-            ),
-          ),
-          // AMBIENT GLOW ORBS
-          Positioned(
-            top: -40,
-            right: -35,
-            child: _GlowOrb(
-              size: 190,
-              color: AppColors.curveRed.withValues(alpha: 0.16),
-            ),
-          ),
-          Positioned(
-            bottom: -55,
-            left: -35,
-            child: _GlowOrb(
-              size: 210,
-              color: AppColors.textFor(context).withValues(alpha: 0.06),
-            ),
-          ),
-          // CONTENT
-          Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: child,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HeroVisualDeck extends StatefulWidget {
-  const _HeroVisualDeck();
+/// Apple/macOS-inspired Studio Deck Window with Glass Title Bar & Interactive Tabs
+class _MacStudioDeck extends StatefulWidget {
+  const _MacStudioDeck();
 
   @override
-  State<_HeroVisualDeck> createState() => _HeroVisualDeckState();
+  State<_MacStudioDeck> createState() => _MacStudioDeckState();
 }
 
-class _HeroVisualDeckState extends State<_HeroVisualDeck> {
-  static const Duration _holdDuration = Duration(milliseconds: 4600);
-  static const Duration _transitionDuration = Duration(milliseconds: 950);
+class _MacStudioDeckState extends State<_MacStudioDeck> {
+  static const Duration _autoCycleDuration = Duration(milliseconds: 5000);
+  static const Duration _fadeDuration = Duration(milliseconds: 650);
 
-  static const List<String> _images = <String>[
-    AppAssets.galleryHeroHome1,
-    AppAssets.galleryHeroHome2,
-    AppAssets.galleryHeroHome3,
-    AppAssets.galleryHeroHome4,
+  static const List<({String title, String tag, String asset})> _slides = [
+    (
+      title: 'Solita Commercial Suite',
+      tag: 'PRODUCTION',
+      asset: AppAssets.heroStudioRed,
+    ),
+    (
+      title: 'Brand Philosophy Geometry',
+      tag: 'ARCHITECTURE',
+      asset: AppAssets.heroStraightforward,
+    ),
+    (
+      title: 'Discover The Curve',
+      tag: 'CAMPAIGN',
+      asset: AppAssets.heroDiscoverCurve,
+    ),
+    (
+      title: 'The Crafters Collective',
+      tag: 'SPECIALISTS',
+      asset: AppAssets.heroWhoAreWe,
+    ),
   ];
 
   late final Timer _timer;
@@ -280,11 +281,9 @@ class _HeroVisualDeckState extends State<_HeroVisualDeck> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(_holdDuration, (_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() => _index = (_index + 1) % _images.length);
+    _timer = Timer.periodic(_autoCycleDuration, (_) {
+      if (!mounted) return;
+      setState(() => _index = (_index + 1) % _slides.length);
     });
   }
 
@@ -296,63 +295,138 @@ class _HeroVisualDeckState extends State<_HeroVisualDeck> {
 
   @override
   Widget build(BuildContext context) {
-    return _HeroVisual(
+    final bool isDark = AppColors.isDark(context);
+    final activeSlide = _slides[_index];
+
+    return Container(
+      decoration: ShapeDecoration(
+        color: isDark ? const Color(0xFF101014) : const Color(0xFFF3F5F8),
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 22,
+            cornerSmoothing: 0.6,
+          ),
+          side: BorderSide(
+            color: AppColors.strokeFor(context),
+            width: 1.0,
+          ),
+        ),
+        shadows: [
+          BoxShadow(
+            color: (isDark ? Colors.black : const Color(0xFF101216))
+                .withValues(alpha: isDark ? 0.35 : 0.06),
+            blurRadius: 28,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
       child: Column(
         children: <Widget>[
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: AnimatedSwitcher(
-                duration: _transitionDuration,
-                reverseDuration: const Duration(milliseconds: 680),
-                switchInCurve: Curves.easeOutQuart,
-                switchOutCurve: Curves.easeInCubic,
-                transitionBuilder: (
-                  Widget child,
-                  Animation<double> animation,
-                ) {
-                  final Animation<Offset> slide = Tween<Offset>(
-                    begin: const Offset(0.2, 0),
-                    end: Offset.zero,
-                  ).animate(animation);
-
-                  final Animation<double> fade = CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeOut,
-                  );
-
-                  final Animation<double> tilt = Tween<double>(
-                    begin: 0.02,
-                    end: 0,
-                  ).animate(animation);
-
-                  return FadeTransition(
-                    opacity: fade,
-                    child: SlideTransition(
-                      position: slide,
-                      child: AnimatedBuilder(
-                        animation: tilt,
-                        child: child,
-                        builder: (BuildContext context, Widget? inner) {
-                          return Transform(
-                            alignment: Alignment.center,
-                            transform: Matrix4.identity()
-                              ..setEntry(3, 2, 0.001)
-                              ..rotateY(tilt.value),
-                            child: inner,
-                          );
-                        },
+          // macOS Window Header Bar
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? const Color(0xFF16161B)
+                  : const Color(0xFFE9ECF1),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(21)),
+              border: Border(
+                bottom: BorderSide(color: AppColors.strokeFor(context), width: 1.0),
+              ),
+            ),
+            child: Row(
+              children: [
+                // Traffic Lights (macOS style)
+                Row(
+                  children: [
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFF5F56),
+                        shape: BoxShape.circle,
                       ),
                     ),
-                  );
-                },
-                child: Container(
-                  key: ValueKey<int>(_index),
-                  color:
-                      AppColors.backgroundFor(context).withValues(alpha: 0.2),
-                  child: Center(
+                    const SizedBox(width: 6),
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFFBD2E),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF27C93F),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
+                    'studio_viewport.app',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.mutedFor(context),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.curveRed.withValues(alpha: isDark ? 0.15 : 0.1),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    activeSlide.tag,
+                    style: const TextStyle(
+                      color: AppColors.curveRed,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Main Viewport Canvas
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: ClipSmoothRect(
+                radius: SmoothBorderRadius(
+                  cornerRadius: 14,
+                  cornerSmoothing: 0.6,
+                ),
+                child: AnimatedSwitcher(
+                  duration: _fadeDuration,
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  transitionBuilder: (Widget child, Animation<double> animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                  child: Container(
+                    key: ValueKey<int>(_index),
+                    color: isDark
+                        ? const Color(0xFF09090B)
+                        : const Color(0xFFE5E8ED),
+                    alignment: Alignment.center,
                     child: Image.asset(
-                      _images[_index],
+                      activeSlide.asset,
                       fit: BoxFit.contain,
                       width: double.infinity,
                       height: double.infinity,
@@ -363,63 +437,49 @@ class _HeroVisualDeckState extends State<_HeroVisualDeck> {
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          // CAROUSEL INDICATORS
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List<Widget>.generate(_images.length, (int i) {
-              final bool active = i == _index;
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOutCubic,
-                  width: active ? 24 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: active
-                        ? AppColors.curveRed
-                        : AppColors.textFor(context).withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(999),
-                    boxShadow: active
-                        ? [
-                            BoxShadow(
-                              color: AppColors.curveRed.withValues(alpha: 0.4),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ]
-                        : [],
+
+          // Interactive Tab Selector (macOS Dock Style)
+          Container(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+            child: Row(
+              children: List<Widget>.generate(_slides.length, (int i) {
+                final bool active = i == _index;
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _index = i),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOutCubic,
+                      margin: const EdgeInsets.symmetric(horizontal: 2),
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      decoration: BoxDecoration(
+                        color: active
+                            ? (isDark ? const Color(0xFF22222A) : Colors.white)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: active
+                              ? AppColors.curveRed.withValues(alpha: 0.5)
+                              : Colors.transparent,
+                          width: 1.0,
+                        ),
+                      ),
+                      child: Text(
+                        '0${i + 1}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: active
+                              ? AppColors.curveRed
+                              : AppColors.mutedFor(context),
+                          fontSize: 10.5,
+                          fontWeight: active ? FontWeight.w800 : FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              );
-            }),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _GlowOrb extends StatelessWidget {
-  const _GlowOrb({required this.size, required this.color});
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color,
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: color,
-            blurRadius: 80,
-            spreadRadius: 8,
+                );
+              }),
+            ),
           ),
         ],
       ),
@@ -432,11 +492,13 @@ class _HeroActionButton extends StatefulWidget {
     required this.label,
     required this.onTap,
     this.outlined = false,
+    this.icon,
   });
 
   final String label;
   final VoidCallback onTap;
   final bool outlined;
+  final IconData? icon;
 
   @override
   State<_HeroActionButton> createState() => _HeroActionButtonState();
@@ -447,21 +509,97 @@ class _HeroActionButtonState extends State<_HeroActionButton> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = AppColors.isDark(context);
+
+    if (widget.outlined) {
+      return MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          decoration: ShapeDecoration(
+            color: _hovered
+                ? AppColors.textFor(context).withValues(alpha: 0.08)
+                : Colors.transparent,
+            shape: SmoothRectangleBorder(
+              borderRadius: SmoothBorderRadius(
+                cornerRadius: 14,
+                cornerSmoothing: 0.6,
+              ),
+              side: BorderSide(
+                color: _hovered
+                    ? AppColors.textFor(context).withValues(alpha: 0.4)
+                    : AppColors.strokeFor(context),
+                width: 1.2,
+              ),
+            ),
+          ),
+          child: TextButton(
+            onPressed: widget.onTap,
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.textFor(context),
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+              textStyle: const TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 13.5,
+                letterSpacing: 0.2,
+              ),
+            ),
+            child: Text(widget.label),
+          ),
+        ),
+      );
+    }
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      onEnter: (_) {
-        setState(() => _hovered = true);
-      },
-      onExit: (_) {
-        setState(() => _hovered = false);
-      },
-      child: AnimatedScale(
-        duration: const Duration(milliseconds: 160),
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
-        scale: _hovered ? 1.02 : 1,
-        child: widget.outlined
-            ? OutlinedButton(onPressed: widget.onTap, child: Text(widget.label))
-            : FilledButton(onPressed: widget.onTap, child: Text(widget.label)),
+        transform: Matrix4.identity()
+          ..translateByDouble(0.0, _hovered ? -2.0 : 0.0, 0.0, 1.0),
+        decoration: ShapeDecoration(
+          color: _hovered ? AppColors.curveRedHover : AppColors.curveRed,
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 14,
+              cornerSmoothing: 0.6,
+            ),
+            side: BorderSide(
+              color: Colors.white.withValues(alpha: isDark ? 0.25 : 0.4),
+              width: 1.0,
+            ),
+          ),
+          shadows: [
+            BoxShadow(
+              color: AppColors.curveRed.withValues(alpha: _hovered ? 0.35 : 0.18),
+              blurRadius: _hovered ? 20 : 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: FilledButton.icon(
+          onPressed: widget.onTap,
+          icon: widget.icon != null
+              ? Icon(widget.icon, size: 15)
+              : const SizedBox.shrink(),
+          label: Text(widget.label),
+          style: FilledButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 13.5,
+              letterSpacing: 0.2,
+            ),
+          ),
+        ),
       ),
     );
   }

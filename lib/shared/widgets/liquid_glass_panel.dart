@@ -1,18 +1,19 @@
 import 'dart:ui';
 
 import 'package:creative_curve_web/core/constants/app_colors.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 
-/// Frosted liquid-glass surface with specular edge, inner highlight,
-/// and optional hover morph (scale + red accent glow).
+/// Ultra-refined architectural frosted glass surface with subtle specular edge,
+/// calibrated optical blur, and elegant hover micro-interactions.
 class LiquidGlassPanel extends StatefulWidget {
   const LiquidGlassPanel({
     required this.child,
     this.padding,
-    this.borderRadius = 20,
-    this.blurSigma = 22,
+    this.borderRadius = 22,
+    this.blurSigma = 20,
     this.enableHover = true,
-    this.hoverScale = 1.02,
+    this.hoverScale = 1.01,
     this.onTap,
     this.width,
     this.height,
@@ -41,50 +42,57 @@ class _LiquidGlassPanelState extends State<LiquidGlassPanel> {
   @override
   Widget build(BuildContext context) {
     final bool dark = AppColors.isDark(context);
-    final BorderRadius radius = BorderRadius.circular(widget.borderRadius);
+    final SmoothBorderRadius radius = SmoothBorderRadius(
+      cornerRadius: widget.borderRadius,
+      cornerSmoothing: 0.6,
+    );
 
     final Color fill = dark
-        ? AppColors.surfaceDark.withValues(alpha: 0.55)
-        : Colors.white.withValues(alpha: 0.52);
+        ? const Color(0xFF141418).withValues(alpha: 0.72)
+        : Colors.white.withValues(alpha: 0.78);
 
-    final Color edgeTop = dark
-        ? Colors.white.withValues(alpha: 0.28)
-        : Colors.white.withValues(alpha: 0.85);
-    final Color edgeRed = AppColors.curveRed.withValues(alpha: _hovered ? 0.55 : 0.22);
-    final Color edgeFade = dark
-        ? Colors.white.withValues(alpha: 0.04)
-        : Colors.white.withValues(alpha: 0.08);
+    final Color edgeSpecular = dark
+        ? Colors.white.withValues(alpha: _hovered ? 0.22 : 0.12)
+        : Colors.black.withValues(alpha: _hovered ? 0.12 : 0.06);
 
     final List<BoxShadow> shadows = <BoxShadow>[
       BoxShadow(
-        color: AppColors.curveRed.withValues(alpha: _hovered ? 0.18 : 0.08),
-        blurRadius: _hovered ? 28 : 18,
-        offset: Offset(0, _hovered ? 14 : 10),
-        spreadRadius: _hovered ? 1 : 0,
+        color: (dark ? Colors.black : const Color(0xFF101216))
+            .withValues(alpha: dark ? (_hovered ? 0.35 : 0.2) : (_hovered ? 0.08 : 0.04)),
+        blurRadius: _hovered ? 24 : 14,
+        offset: Offset(0, _hovered ? 10 : 6),
       ),
-      BoxShadow(
-        color: (dark ? Colors.black : const Color(0xFF1A1A1F))
-            .withValues(alpha: dark ? 0.35 : 0.08),
-        blurRadius: 24,
-        offset: const Offset(0, 12),
-      ),
+      if (_hovered)
+        BoxShadow(
+          color: AppColors.curveRed.withValues(alpha: dark ? 0.08 : 0.04),
+          blurRadius: 28,
+          offset: const Offset(0, 8),
+        ),
     ];
 
     Widget panel = AnimatedScale(
-      duration: const Duration(milliseconds: 260),
+      duration: const Duration(milliseconds: 240),
       curve: Curves.easeOutCubic,
       scale: widget.enableHover && _hovered ? widget.hoverScale : 1,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 260),
+        duration: const Duration(milliseconds: 240),
         curve: Curves.easeOutCubic,
         width: widget.width,
         height: widget.height,
-        decoration: BoxDecoration(
-          borderRadius: radius,
-          boxShadow: shadows,
+        decoration: ShapeDecoration(
+          shape: SmoothRectangleBorder(
+            borderRadius: radius,
+            side: BorderSide(
+              color: _hovered
+                  ? AppColors.curveRed.withValues(alpha: dark ? 0.5 : 0.35)
+                  : AppColors.strokeFor(context),
+              width: 1.0,
+            ),
+          ),
+          shadows: shadows,
         ),
-        child: ClipRRect(
-          borderRadius: radius,
+        child: ClipSmoothRect(
+          radius: radius,
           clipBehavior: widget.clipBehavior,
           child: BackdropFilter(
             filter: ImageFilter.blur(
@@ -94,45 +102,25 @@ class _LiquidGlassPanelState extends State<LiquidGlassPanel> {
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: fill,
-                borderRadius: radius,
-                border: Border.all(
-                  width: 1.2,
-                  color: Colors.transparent,
-                ),
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: <Color>[
-                    edgeTop.withValues(alpha: dark ? 0.14 : 0.35),
+                    dark
+                        ? Colors.white.withValues(alpha: 0.04)
+                        : Colors.white.withValues(alpha: 0.9),
                     fill,
-                    AppColors.curveRed.withValues(alpha: dark ? 0.06 : 0.04),
+                    dark
+                        ? Colors.black.withValues(alpha: 0.1)
+                        : const Color(0xFFF6F8FA).withValues(alpha: 0.4),
                   ],
-                  stops: const <double>[0, 0.45, 1],
+                  stops: const <double>[0, 0.5, 1],
                 ),
               ),
               child: Stack(
                 fit: StackFit.passthrough,
                 children: <Widget>[
-                  // Specular stroke ring (multi-stop feel via layered borders).
-                  Positioned.fill(
-                    child: IgnorePointer(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          borderRadius: radius,
-                          border: Border(
-                            top: BorderSide(color: edgeTop, width: 1.1),
-                            left: BorderSide(
-                              color: edgeTop.withValues(alpha: 0.55),
-                              width: 1,
-                            ),
-                            right: BorderSide(color: edgeFade, width: 1),
-                            bottom: BorderSide(color: edgeRed, width: _hovered ? 1.4 : 1),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Inner highlight wash (top-left refraction).
+                  // Specular top highlight line
                   Positioned(
                     top: 0,
                     left: 0,
@@ -143,8 +131,8 @@ class _LiquidGlassPanelState extends State<LiquidGlassPanel> {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: <Color>[
-                              Colors.white.withValues(alpha: dark ? 0.35 : 0.7),
-                              Colors.white.withValues(alpha: 0),
+                              edgeSpecular,
+                              Colors.transparent,
                             ],
                           ),
                         ),
@@ -188,6 +176,6 @@ class _LiquidGlassPanelState extends State<LiquidGlassPanel> {
 
 abstract final class ResponsiveGlassInsets {
   static const double sm = 12;
-  static const double md = 16;
+  static const double md = 18;
   static const double lg = 24;
 }

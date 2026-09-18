@@ -1,29 +1,38 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
+import 'package:creative_curve_web/core/constants/app_assets.dart';
+import 'package:creative_curve_web/features/gallery/data/gallery_catalog.dart';
+import 'package:creative_curve_web/features/team/application/team_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    
+  group('Asset & Catalog Integrity Tests', () {
+    test('All 15 gallery assets are registered in AppAssets.allGallery', () {
+      expect(AppAssets.allGallery.length, equals(15));
+      for (final asset in AppAssets.allGallery) {
+        expect(asset.startsWith('assets/gallery/'), isTrue);
+        expect(asset.endsWith('.png') || asset.endsWith('.jpg'), isTrue);
+      }
+    });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    test('Gallery catalog contains all 15 gallery items with 16:9 ratio', () {
+      expect(GalleryCatalog.items.length, equals(15));
+      for (final item in GalleryCatalog.items) {
+        expect(item.aspectRatio, equals(16 / 9));
+        expect(item.title.isNotEmpty, isTrue);
+        expect(item.category.isNotEmpty, isTrue);
+        expect(item.description.isNotEmpty, isTrue);
+      }
+    });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    test('Team members have authentic local profile assets', () {
+      final members = TeamMembers().build();
+      expect(members.length, equals(4));
+      for (final member in members) {
+        expect(member.imagePath.startsWith('assets/gallery/'), isTrue);
+        expect(member.name.isNotEmpty, isTrue);
+        expect(member.role.isNotEmpty, isTrue);
+        expect(member.tagline.isNotEmpty, isTrue);
+      }
+    });
   });
 }
+

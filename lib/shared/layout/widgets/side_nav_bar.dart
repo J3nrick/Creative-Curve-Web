@@ -19,12 +19,14 @@ class SideNavBar extends StatelessWidget {
   final VoidCallback onToggleTheme;
 
   static final SmoothBorderRadius _radius = SmoothBorderRadius(
-    cornerRadius: 30,
+    cornerRadius: 28,
     cornerSmoothing: 0.6,
   );
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = AppColors.isDark(context);
+
     return Container(
       width: 112,
       margin: const EdgeInsets.fromLTRB(14, 14, 10, 14),
@@ -32,7 +34,7 @@ class SideNavBar extends StatelessWidget {
         color: AppColors.surfaceFor(context),
         shape: SmoothRectangleBorder(
           borderRadius: _radius,
-          side: BorderSide(color: AppColors.strokeFor(context)),
+          side: BorderSide(color: AppColors.strokeFor(context), width: 1.0),
         ),
       ),
       child: Column(
@@ -43,13 +45,13 @@ class SideNavBar extends StatelessWidget {
               children: <Widget>[
                 const Expanded(
                   child: CurveLogo(
-                    height: 32,
+                    height: 30,
                     semanticLabel: 'Creative Curve logo',
                   ),
                 ),
                 IconButton(
                   onPressed: onToggleTheme,
-                  tooltip: themeMode == ThemeMode.dark
+                  tooltip: isDark
                       ? 'Switch to light mode'
                       : 'Switch to dark mode',
                   splashColor: Colors.transparent,
@@ -62,21 +64,22 @@ class SideNavBar extends StatelessWidget {
                     minimumSize: const Size(24, 24),
                   ),
                   icon: Icon(
-                    themeMode == ThemeMode.dark
+                    isDark
                         ? Icons.wb_sunny_rounded
                         : Icons.dark_mode_rounded,
-                    size: 18,
-                    color: AppColors.textFor(context),
+                    size: 16,
+                    color: AppColors.mutedFor(context),
                   ),
                 ),
               ],
             ),
           ),
+          const SizedBox(height: 8),
           Expanded(
             child: ListView.separated(
               itemCount: items.length,
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              separatorBuilder: (_, __) => const SizedBox(height: 6),
               itemBuilder: (BuildContext context, int index) {
                 final ({String label, String path}) item = items[index];
                 return _SideNavButton(
@@ -87,10 +90,10 @@ class SideNavBar extends StatelessWidget {
               },
             ),
           ),
-          const _StatusPill(),
+          const _StudioStatusBadge(),
           const SizedBox(height: 8),
           const _SocialIconButtons(),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
         ],
       ),
     );
@@ -117,35 +120,36 @@ class _SideNavButtonState extends State<_SideNavButton> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = AppColors.isDark(context);
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      onEnter: (_) {
-        setState(() => _hovered = true);
-      },
-      onExit: (_) {
-        setState(() => _hovered = false);
-      },
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
           decoration: ShapeDecoration(
             color: widget.active
-                ? AppColors.curveRed.withValues(alpha: 0.2)
+                ? AppColors.curveRed.withValues(alpha: isDark ? 0.16 : 0.1)
                 : _hovered
-                    ? AppColors.textFor(context).withValues(alpha: 0.06)
+                    ? AppColors.textFor(context).withValues(alpha: 0.05)
                     : Colors.transparent,
             shape: SmoothRectangleBorder(
               borderRadius: SmoothBorderRadius(
-                cornerRadius: 16,
+                cornerRadius: 14,
                 cornerSmoothing: 0.6,
               ),
               side: BorderSide(
                 color: widget.active
-                    ? AppColors.curveRed.withValues(alpha: 0.7)
-                    : AppColors.strokeFor(context),
+                    ? AppColors.curveRed.withValues(alpha: 0.55)
+                    : _hovered
+                        ? AppColors.strokeFor(context)
+                        : Colors.transparent,
+                width: 1.0,
               ),
             ),
           ),
@@ -157,10 +161,13 @@ class _SideNavButtonState extends State<_SideNavButton> {
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: widget.active
-                      ? AppColors.textFor(context)
-                      : AppColors.mutedFor(context),
+                      ? (isDark ? Colors.white : AppColors.textLight)
+                      : _hovered
+                          ? AppColors.textFor(context)
+                          : AppColors.mutedFor(context),
                   fontWeight: widget.active ? FontWeight.w700 : FontWeight.w500,
-                  letterSpacing: 0,
+                  fontSize: 12,
+                  letterSpacing: -0.1,
                 ),
           ),
         ),
@@ -169,66 +176,127 @@ class _SideNavButtonState extends State<_SideNavButton> {
   }
 }
 
-// --- STATUS PILL ---
+// --- STUDIO STATUS BADGE ---
 
-class _StatusPill extends StatelessWidget {
-  const _StatusPill();
+class _StudioStatusBadge extends StatelessWidget {
+  const _StudioStatusBadge();
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = AppColors.isDark(context);
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: ShapeDecoration(
-        color: AppColors.curveRed.withValues(alpha: 0.15),
+        color: isDark
+            ? const Color(0xFF19191D)
+            : const Color(0xFFF3F4F6),
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
-            cornerRadius: 12,
+            cornerRadius: 14,
             cornerSmoothing: 0.6,
           ),
           side: BorderSide(
-            color: AppColors.curveRed.withValues(alpha: 0.5),
+            color: AppColors.strokeFor(context),
+            width: 1.0,
           ),
         ),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                '🟢',
-                style: TextStyle(fontSize: 12),
-              ),
-              const SizedBox(width: 4),
-              Expanded(
+              const _LiveStatusDot(),
+              const SizedBox(width: 5),
+              Flexible(
                 child: Text(
-                  'Available',
+                  'STUDIO',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.curveRed,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 10,
-                      ),
+                  style: TextStyle(
+                    color: AppColors.mutedFor(context),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 9.5,
+                    letterSpacing: 1.2,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 3),
           Text(
-            'New Projects',
+            'Accepting\nProjects',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.curveRed.withValues(alpha: 0.7),
-                  fontSize: 9,
+                  color: AppColors.textFor(context),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 10,
+                  height: 1.15,
                 ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
+    );
+  }
+}
+
+class _LiveStatusDot extends StatefulWidget {
+  const _LiveStatusDot();
+
+  @override
+  State<_LiveStatusDot> createState() => _LiveStatusDotState();
+}
+
+class _LiveStatusDotState extends State<_LiveStatusDot>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 0.4, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _pulseAnimation,
+      builder: (context, child) {
+        return Container(
+          width: 7,
+          height: 7,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xFF34C759),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF34C759)
+                    .withValues(alpha: _pulseAnimation.value * 0.6),
+                blurRadius: 6,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -241,32 +309,26 @@ class _SocialIconButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 6),
       child: Wrap(
         alignment: WrapAlignment.center,
-        spacing: 6,
-        runSpacing: 6,
+        spacing: 4,
+        runSpacing: 4,
         children: [
           _SocialIconButton(
             icon: Icons.link_rounded,
             tooltip: 'LinkedIn',
-            onPressed: () {
-              // TODO: Add LinkedIn URL
-            },
+            onPressed: () {},
           ),
           _SocialIconButton(
             icon: Icons.language_rounded,
-            tooltip: 'X (Twitter)',
-            onPressed: () {
-              // TODO: Add Twitter/X URL
-            },
+            tooltip: 'Website',
+            onPressed: () {},
           ),
           _SocialIconButton(
             icon: Icons.camera_alt_rounded,
             tooltip: 'Instagram',
-            onPressed: () {
-              // TODO: Add Instagram URL
-            },
+            onPressed: () {},
           ),
         ],
       ),
@@ -298,10 +360,10 @@ class _SocialIconButtonState extends State<_SocialIconButton> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 180),
         decoration: ShapeDecoration(
           color: _hovered
-              ? AppColors.textFor(context).withValues(alpha: 0.08)
+              ? AppColors.textFor(context).withValues(alpha: 0.07)
               : Colors.transparent,
           shape: SmoothRectangleBorder(
             borderRadius: SmoothBorderRadius(
@@ -310,8 +372,8 @@ class _SocialIconButtonState extends State<_SocialIconButton> {
             ),
             side: BorderSide(
               color: _hovered
-                  ? AppColors.textFor(context).withValues(alpha: 0.2)
-                  : AppColors.strokeFor(context),
+                  ? AppColors.strokeFor(context)
+                  : Colors.transparent,
             ),
           ),
         ),
@@ -319,19 +381,21 @@ class _SocialIconButtonState extends State<_SocialIconButton> {
           message: widget.tooltip,
           child: IconButton(
             onPressed: widget.onPressed,
-            iconSize: 18,
+            iconSize: 15,
             splashColor: Colors.transparent,
             hoverColor: Colors.transparent,
             highlightColor: Colors.transparent,
             style: IconButton.styleFrom(
               backgroundColor: Colors.transparent,
               surfaceTintColor: Colors.transparent,
-              padding: const EdgeInsets.all(6),
-              minimumSize: const Size(32, 32),
+              padding: const EdgeInsets.all(4),
+              minimumSize: const Size(28, 28),
             ),
             icon: Icon(
               widget.icon,
-              color: AppColors.mutedFor(context),
+              color: _hovered
+                  ? AppColors.textFor(context)
+                  : AppColors.mutedFor(context),
             ),
           ),
         ),
@@ -339,4 +403,3 @@ class _SocialIconButtonState extends State<_SocialIconButton> {
     );
   }
 }
-

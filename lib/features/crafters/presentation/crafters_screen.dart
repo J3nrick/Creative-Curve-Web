@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-
+import 'package:creative_curve_web/core/constants/app_assets.dart';
 import 'package:creative_curve_web/core/constants/app_colors.dart';
 import 'package:creative_curve_web/shared/widgets/curve_logo.dart';
 import 'package:flutter/material.dart';
@@ -15,35 +15,31 @@ class _CraftersScreenState extends State<CraftersScreen> {
   final ScrollController _scrollController = ScrollController();
 
   static const List<
-          ({String name, String line, String imageUrl, bool darkShell})>
+          ({String name, String line, String imageAsset, bool darkShell})>
       _crafters =
-      <({String name, String line, String imageUrl, bool darkShell})>[
+      <({String name, String line, String imageAsset, bool darkShell})>[
     (
       name: 'Krystal',
-      line: 'Disney princess spirit with strategic precision.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=1800&q=80',
+      line: 'Strategic precision and disciplined delivery across every milestone.',
+      imageAsset: AppAssets.profileKrystal,
       darkShell: false,
     ),
     (
       name: 'Zyle',
-      line: 'Frame by frame momentum. LFG!',
-      imageUrl:
-          'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=1800&q=80',
+      line: 'High-velocity market positioning and high-converting content frameworks.',
+      imageAsset: AppAssets.profileZyle,
       darkShell: true,
     ),
     (
       name: 'Erika',
-      line: 'Narrative systems that make brands unforgettable.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1800&q=80',
+      line: 'Bespoke design systems that make brands unforgettable.',
+      imageAsset: AppAssets.profileErika,
       darkShell: false,
     ),
     (
       name: 'JP',
-      line: 'Rhythm, motion, and fearless craft. LFG!',
-      imageUrl:
-          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1800&q=80',
+      line: 'Cinematic visual storytelling, motion craft, and commercial polish.',
+      imageAsset: AppAssets.profileJp,
       darkShell: true,
     ),
   ];
@@ -81,7 +77,7 @@ class _CraftersScreenState extends State<CraftersScreen> {
         final ({
           String name,
           String line,
-          String imageUrl,
+          String imageAsset,
           bool darkShell
         }) crafter = _crafters[index];
         final double sectionTop = index * (sectionHeight + 14);
@@ -97,7 +93,7 @@ class _CraftersScreenState extends State<CraftersScreen> {
         return _CrafterSection(
           name: crafter.name,
           line: crafter.line,
-          imageUrl: crafter.imageUrl,
+          imageAsset: crafter.imageAsset,
           darkShell: crafter.darkShell,
           height: sectionHeight,
           imageScale: scale,
@@ -113,7 +109,7 @@ class _CrafterSection extends StatelessWidget {
   const _CrafterSection({
     required this.name,
     required this.line,
-    required this.imageUrl,
+    required this.imageAsset,
     required this.darkShell,
     required this.height,
     required this.imageScale,
@@ -121,7 +117,7 @@ class _CrafterSection extends StatelessWidget {
 
   final String name;
   final String line;
-  final String imageUrl;
+  final String imageAsset;
   final bool darkShell;
   final double height;
   final double imageScale;
@@ -144,19 +140,10 @@ class _CrafterSection extends StatelessWidget {
             children: <Widget>[
               Transform.scale(
                 scale: imageScale,
-                child: Image.network(
-                  imageUrl,
+                child: Image.asset(
+                  imageAsset,
                   fit: BoxFit.cover,
-                  loadingBuilder: (BuildContext context, Widget child,
-                      ImageChunkEvent? progress) {
-                    if (progress == null) {
-                      return child;
-                    }
-                    return Container(
-                        color: darkShell
-                            ? const Color(0xFF1D1D1D)
-                            : const Color(0xFFEAECEF));
-                  },
+                  filterQuality: FilterQuality.high,
                 ),
               ),
               Container(
@@ -166,7 +153,7 @@ class _CrafterSection extends StatelessWidget {
                     end: Alignment.topCenter,
                     colors: <Color>[
                       (darkShell ? Colors.black : const Color(0xFF101010))
-                          .withValues(alpha: 0.55),
+                          .withValues(alpha: 0.65),
                       Colors.transparent,
                     ],
                   ),
@@ -179,20 +166,20 @@ class _CrafterSection extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     CurveLogo(
-                      height: compact ? 28 : 34,
+                      height: compact ? 26 : 32,
                       variant: darkShell
                           ? CurveLogoVariant.white
                           : CurveLogoVariant.red,
                       semanticLabel: 'Creative Curve logo',
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 12),
                     Text(
                       name,
                       style:
                           Theme.of(context).textTheme.displayMedium?.copyWith(
                                 color: textColor,
-                                fontSize: compact ? 38 : 58,
-                                height: 1,
+                                fontSize: compact ? 36 : 54,
+                                height: 1.0,
                               ),
                     ),
                     const SizedBox(height: 8),
@@ -212,11 +199,11 @@ class _CrafterSection extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'LFG!',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      'CREATIVE CURVE',
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                             color: AppColors.curveRed,
                             fontWeight: FontWeight.w800,
-                            letterSpacing: 1.2,
+                            letterSpacing: 1.6,
                           ),
                     ),
                   ],
@@ -230,8 +217,9 @@ class _CrafterSection extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                     color:
-                        Colors.black.withValues(alpha: darkShell ? 0.32 : 0.46),
+                        Colors.black.withValues(alpha: darkShell ? 0.35 : 0.5),
                     borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: Colors.white24, width: 1.0),
                   ),
                   child: Text(
                     '0${math.max(1, name.length)}',

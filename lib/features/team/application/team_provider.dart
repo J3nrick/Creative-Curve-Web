@@ -1,3 +1,4 @@
+import 'package:creative_curve_web/core/constants/app_assets.dart';
 import 'package:creative_curve_web/features/team/domain/team_member.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -10,39 +11,51 @@ class TeamMembers extends _$TeamMembers {
     return const <TeamMember>[
       TeamMember(
         name: 'Krystal',
-        role: 'Project Manager',
+        role: 'Project Manager & Operations Lead',
+        tagline:
+            'Orchestrating high-impact brand delivery with disciplined strategy and collaborative leadership.',
         focus:
-            'Growth, efficiency, and project collaboration from start to finish.',
-        personality: 'Keeps teams aligned, calm, and moving with precision.',
-        hobbies: <String>['Travel', 'Singing', 'Exploring new things'],
-        photoTodo: 'Team Photo 1',
+            'Krystal leads and manages projects from inception to final delivery, ensuring alignment with core business objectives. She specializes in streamlining creative workflows, driving interdisciplinary collaboration, and maintaining uncompromising delivery standards.',
+        personality: 'Disciplined leadership paired with inspiring collaborative energy.',
+        hobbies: <String>['Global Travel', 'Acoustic Music', 'Design Exploration'],
+        imagePath: AppAssets.profileKrystal,
+        photoTodo: 'Krystal Profile Card',
       ),
       TeamMember(
         name: 'Zyle',
-        role: 'Sales & Content',
+        role: 'Sales & Content Strategist',
+        tagline:
+            'Driving client velocity and market impact through high-converting content architectures.',
         focus:
-            'Campaign storytelling, sales velocity, and unconventional strategy.',
-        personality: 'The go-to operator for making things happen at speed.',
-        hobbies: <String>['Tennis', 'Golf', 'Mobile games', 'Cooking'],
-        photoTodo: 'Team Photo 2',
+            'Zyle develops high-converting content frameworks and builds enduring client partnerships. He connects brand narratives with actionable distribution strategies that generate measurable market momentum.',
+        personality: 'High-velocity operator focused on strategic growth and execution.',
+        hobbies: <String>['Tennis & Golf', 'Strategic Gaming', 'Creative Conceptualization'],
+        imagePath: AppAssets.profileZyle,
+        photoTodo: 'Zyle Profile Card',
       ),
       TeamMember(
         name: 'Erika',
-        role: 'Creative Lead',
+        role: 'Creative Director & Design Lead',
+        tagline:
+            'Crafting bespoke design systems, brand identities, and immersive visual storytelling.',
         focus:
-            'Creative vision, branding direction, and final review of assets and copy.',
-        personality: 'Crafts bold visual systems with intentional detail.',
-        hobbies: <String>['Tennis', 'Golf', 'Oil Painting'],
-        photoTodo: 'Team Photo 3',
+            'Erika directs end-to-end visual vision and brand architecture across all client touchpoints. She oversees asset creation, art direction, and typography systems to ensure consistent aesthetic excellence.',
+        personality: 'Curates bold visual languages with meticulous attention to craft.',
+        hobbies: <String>['Tennis', 'Golf', 'Fine Art & Painting'],
+        imagePath: AppAssets.profileErika,
+        photoTodo: 'Erika Profile Card',
       ),
       TeamMember(
         name: 'JP',
-        role: 'Media Producer',
+        role: 'Media Producer & Cinematographer',
+        tagline:
+            'Directing cinematic visual narratives and commercial media that elevate brand prestige.',
         focus:
-            'High-quality visual storytelling through photo and video production.',
-        personality: 'Turns concepts into polished visual narratives.',
-        hobbies: <String>['Photography', 'Cafe Hopping', 'Anime'],
-        photoTodo: 'Team Photo 4',
+            'JP specializes in high-fidelity commercial photography, video direction, and cinematic post-production. From pre-production planning to precision color grading, he ensures every visual asset tells a compelling story.',
+        personality: 'Cinematic visual storytelling and dynamic motion craft.',
+        hobbies: <String>['Commercial Photography', 'Specialty Coffee', 'Animation Arts'],
+        imagePath: AppAssets.profileJp,
+        photoTodo: 'JP Profile Card',
       ),
     ];
   }

@@ -59,10 +59,13 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                       color: AppColors.backgroundFor(context),
                       shape: SmoothRectangleBorder(
                         borderRadius: SmoothBorderRadius(
-                          cornerRadius: 34,
+                          cornerRadius: 32,
                           cornerSmoothing: 0.6,
                         ),
-                        side: BorderSide(color: AppColors.strokeFor(context)),
+                        side: BorderSide(
+                          color: AppColors.strokeFor(context),
+                          width: 1.0,
+                        ),
                       ),
                     ),
                     clipBehavior: Clip.antiAlias,
@@ -80,8 +83,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
   }
 
   void _toggleTheme() {
-    final ThemeMode current = ref.read(themeModeProvider);
-    ref.read(themeModeProvider.notifier).state = nextThemeMode(current);
+    ref.read(themeModeProvider.notifier).toggle();
   }
 }
 
@@ -102,78 +104,122 @@ class _MobileFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = AppColors.isDark(context);
+
     return Scaffold(
       backgroundColor: AppColors.backgroundFor(context),
       endDrawer: Drawer(
         backgroundColor: AppColors.surfaceFor(context),
         child: SafeArea(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
             children: <Widget>[
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12),
-                child: CurveLogo(
-                  height: 30,
-                  semanticLabel: 'Creative Curve logo',
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16, top: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const CurveLogo(
+                      height: 28,
+                      semanticLabel: 'Creative Curve logo',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 20),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
                 ),
               ),
               ...items.map(
-                (item) => ListTile(
-                  shape: SmoothRectangleBorder(
-                    borderRadius: SmoothBorderRadius(
-                      cornerRadius: 12,
-                      cornerSmoothing: 0.6,
+                (item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: ListTile(
+                    shape: SmoothRectangleBorder(
+                      borderRadius: SmoothBorderRadius(
+                        cornerRadius: 12,
+                        cornerSmoothing: 0.6,
+                      ),
+                      side: BorderSide(
+                        color: currentPath == item.path
+                            ? AppColors.curveRed.withValues(alpha: 0.5)
+                            : Colors.transparent,
+                      ),
                     ),
+                    tileColor: currentPath == item.path
+                        ? AppColors.curveRed.withValues(alpha: isDark ? 0.14 : 0.08)
+                        : Colors.transparent,
+                    selected: currentPath == item.path,
+                    selectedColor: isDark ? Colors.white : AppColors.textLight,
+                    iconColor: AppColors.mutedFor(context),
+                    title: Text(
+                      item.label,
+                      style: TextStyle(
+                        fontWeight: currentPath == item.path
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                      ),
+                    ),
+                    trailing: Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 16,
+                      color: currentPath == item.path
+                          ? AppColors.curveRed
+                          : AppColors.mutedFor(context),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.go(item.path);
+                    },
                   ),
-                  selected: currentPath == item.path,
-                  selectedColor: AppColors.textFor(context),
-                  iconColor: AppColors.mutedFor(context),
-                  title: Text(item.label),
-                  trailing: const Icon(Icons.arrow_outward_rounded),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    context.go(item.path);
-                  },
                 ),
               ),
             ],
           ),
         ),
       ),
-      body: Column(
-        children: <Widget>[
-          Builder(
-            builder: (BuildContext innerContext) {
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-                child: Row(
-                  children: <Widget>[
-                    const CurveLogo(
-                        height: 30, semanticLabel: 'Creative Curve logo'),
-                    const Spacer(),
-                    IconButton(
-                      onPressed: onToggleTheme,
-                      tooltip: themeMode == ThemeMode.dark
-                          ? 'Switch to light mode'
-                          : 'Switch to dark mode',
-                      icon: Icon(
-                        themeMode == ThemeMode.dark
-                            ? Icons.wb_sunny_rounded
-                            : Icons.dark_mode_rounded,
+      body: SafeArea(
+        child: Column(
+          children: <Widget>[
+            Builder(
+              builder: (BuildContext innerContext) {
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+                  child: Row(
+                    children: <Widget>[
+                      const CurveLogo(
+                        height: 28,
+                        semanticLabel: 'Creative Curve logo',
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.menu_rounded),
-                      onPressed: () =>
-                          Scaffold.of(innerContext).openEndDrawer(),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          Expanded(child: child),
-        ],
+                      const Spacer(),
+                      IconButton(
+                        onPressed: onToggleTheme,
+                        tooltip: isDark
+                            ? 'Switch to light mode'
+                            : 'Switch to dark mode',
+                        icon: Icon(
+                          isDark
+                              ? Icons.wb_sunny_rounded
+                              : Icons.dark_mode_rounded,
+                          size: 18,
+                          color: AppColors.textFor(context),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.menu_rounded,
+                          color: AppColors.textFor(context),
+                        ),
+                        onPressed: () =>
+                            Scaffold.of(innerContext).openEndDrawer(),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            Expanded(child: child),
+          ],
+        ),
       ),
     );
   }
