@@ -1,6 +1,11 @@
 import 'package:creative_curve_web/core/constants/app_assets.dart';
+import 'package:creative_curve_web/core/theme/curve_theme_extension.dart';
+import 'package:creative_curve_web/core/theme/theme_mode_provider.dart';
 import 'package:creative_curve_web/features/gallery/data/gallery_catalog.dart';
 import 'package:creative_curve_web/features/team/application/team_provider.dart';
+import 'package:creative_curve_web/shared/interactions/cursor_magnet_scope.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -34,5 +39,71 @@ void main() {
       }
     });
   });
-}
 
+  group('Theme Engine & HSL Tokens Tests', () {
+    test('CurveThemeExtension dark preset has correct brand and surface tokens', () {
+      const CurveThemeExtension dark = CurveThemeExtension.dark;
+      expect(dark.curveRed, equals(const Color(0xFFFF3B30)));
+      expect(dark.surface, equals(const Color(0xFF141417)));
+      expect(dark.darkSurface, equals(const Color(0xFF141417)));
+      expect(dark.background, equals(const Color(0xFF09090B)));
+      expect(dark.glassBlurSigma, equals(20.0));
+    });
+
+    test('CurveThemeExtension light preset has correct tokens', () {
+      const CurveThemeExtension light = CurveThemeExtension.light;
+      expect(light.curveRed, equals(const Color(0xFFFF3B30)));
+      expect(light.surface, equals(const Color(0xFFFFFFFF)));
+      expect(light.background, equals(const Color(0xFFF7F8FA)));
+      expect(light.textPrimary, equals(const Color(0xFF0F1013)));
+    });
+
+    test('CurveThemeExtension lerp interpolates smoothly', () {
+      const CurveThemeExtension dark = CurveThemeExtension.dark;
+      const CurveThemeExtension light = CurveThemeExtension.light;
+      final CurveThemeExtension mid = dark.lerp(light, 0.5);
+
+      expect(mid.surface, isNotNull);
+      expect(mid.background, isNotNull);
+      expect(mid.glassBlurSigma, equals(20.0));
+    });
+
+    test('ThemeNotifier toggles and sets modes accurately in ProviderContainer', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      expect(container.read(themeModeProvider), equals(ThemeMode.dark));
+
+      container.read(themeModeProvider.notifier).toggle();
+      expect(container.read(themeModeProvider), equals(ThemeMode.light));
+
+      container.read(themeModeProvider.notifier).toggle();
+      expect(container.read(themeModeProvider), equals(ThemeMode.dark));
+
+      container.read(themeModeProvider.notifier).setLight();
+      expect(container.read(themeModeProvider), equals(ThemeMode.light));
+
+      container.read(themeModeProvider.notifier).setDark();
+      expect(container.read(themeModeProvider), equals(ThemeMode.dark));
+
+      container.read(themeModeProvider.notifier).setSystem();
+      expect(container.read(themeModeProvider), equals(ThemeMode.system));
+    });
+  });
+
+  group('Cursor Magnet & Micro-Interactions Tests', () {
+    testWidgets('CursorMagnetScope renders child correctly', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: CursorMagnetScope(
+              child: Text('Magnetic Action'),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Magnetic Action'), findsOneWidget);
+    });
+  });
+}

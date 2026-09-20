@@ -1,9 +1,11 @@
 import 'package:creative_curve_web/core/constants/app_colors.dart';
+import 'package:creative_curve_web/core/theme/curve_theme_extension.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 abstract final class AppTheme {
+  /// Standard G2 squircle container border shape (cornerSmoothing: 0.6)
   static final SmoothRectangleBorder smoothShape = SmoothRectangleBorder(
     borderRadius: SmoothBorderRadius(
       cornerRadius: 20,
@@ -11,6 +13,15 @@ abstract final class AppTheme {
     ),
   );
 
+  /// Card squircle border shape (cornerSmoothing: 0.6)
+  static final SmoothRectangleBorder cardShape = SmoothRectangleBorder(
+    borderRadius: SmoothBorderRadius(
+      cornerRadius: 24,
+      cornerSmoothing: 0.6,
+    ),
+  );
+
+  /// Button squircle shape (cornerSmoothing: 0.6)
   static final SmoothRectangleBorder buttonShape = SmoothRectangleBorder(
     borderRadius: SmoothBorderRadius(
       cornerRadius: 14,
@@ -18,6 +29,15 @@ abstract final class AppTheme {
     ),
   );
 
+  /// Dialog squircle shape (cornerSmoothing: 0.6)
+  static final SmoothRectangleBorder dialogShape = SmoothRectangleBorder(
+    borderRadius: SmoothBorderRadius(
+      cornerRadius: 28,
+      cornerSmoothing: 0.6,
+    ),
+  );
+
+  /// Dark Mode Theme Configuration
   static ThemeData get darkTheme {
     final TextTheme interText = GoogleFonts.interTextTheme();
     final TextTheme grooveText = GoogleFonts.spaceGroteskTextTheme(interText);
@@ -32,6 +52,9 @@ abstract final class AppTheme {
         surface: AppColors.surfaceDark,
         onSurface: AppColors.textDark,
       ),
+      extensions: const <ThemeExtension<dynamic>>[
+        CurveThemeExtension.dark,
+      ],
       textTheme: interText.copyWith(
         displayLarge: grooveText.displayLarge?.copyWith(
           color: AppColors.textDark,
@@ -97,7 +120,12 @@ abstract final class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.surfaceDark,
         elevation: 0,
-        shape: smoothShape,
+        shape: cardShape,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.surfaceDark,
+        elevation: 0,
+        shape: dialogShape,
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
@@ -144,6 +172,7 @@ abstract final class AppTheme {
     );
   }
 
+  /// Light Mode Theme Configuration
   static ThemeData get lightTheme {
     final TextTheme interText = GoogleFonts.interTextTheme();
     final TextTheme grooveText = GoogleFonts.spaceGroteskTextTheme(interText);
@@ -158,6 +187,9 @@ abstract final class AppTheme {
         surface: AppColors.surfaceLight,
         onSurface: AppColors.textLight,
       ),
+      extensions: const <ThemeExtension<dynamic>>[
+        CurveThemeExtension.light,
+      ],
       textTheme: interText.copyWith(
         displayLarge: grooveText.displayLarge?.copyWith(
           color: AppColors.textLight,
@@ -223,7 +255,12 @@ abstract final class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.surfaceLight,
         elevation: 0,
-        shape: smoothShape,
+        shape: cardShape,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.surfaceLight,
+        elevation: 0,
+        shape: dialogShape,
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
