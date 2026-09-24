@@ -13,7 +13,9 @@ class GalleryScreen extends StatefulWidget {
 }
 
 class _GalleryScreenState extends State<GalleryScreen> {
+  final TextEditingController _searchController = TextEditingController();
   String _selectedCategory = 'All';
+  String _searchQuery = '';
 
   static const List<String> _categories = <String>[
     'All',
@@ -25,11 +27,48 @@ class _GalleryScreenState extends State<GalleryScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController
+      ..removeListener(_onSearchChanged)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      _searchQuery = _searchController.text.trim().toLowerCase();
+    });
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+  }
+
+  @override
   Widget build(BuildContext context) {
     const List<GalleryItem> allItems = GalleryCatalog.items;
-    final List<GalleryItem> filteredItems = _selectedCategory == 'All'
-        ? allItems
-        : allItems.where((item) => item.category == _selectedCategory).toList();
+
+    final List<GalleryItem> filteredItems = allItems.where((GalleryItem item) {
+      final bool matchesCategory =
+          _selectedCategory == 'All' || item.category == _selectedCategory;
+      if (!matchesCategory) return false;
+
+      if (_searchQuery.isEmpty) return true;
+
+      final bool matchesTitle = item.title.toLowerCase().contains(_searchQuery);
+      final bool matchesDesc =
+          item.description.toLowerCase().contains(_searchQuery);
+      final bool matchesCat =
+          item.category.toLowerCase().contains(_searchQuery);
+
+      return matchesTitle || matchesDesc || matchesCat;
+    }).toList();
 
     final int columns = ResponsiveLayout.columnsFor(context);
     final bool isDark = AppColors.isDark(context);
@@ -46,6 +85,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
             children: <Widget>[
               // Category Pill Header
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -70,6 +110,23 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       ),
                     ),
                   ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.06)
+                          : const Color(0xFFEDEFF3),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      '${filteredItems.length} of ${allItems.length} Assets',
+                      style: TextStyle(
+                        color: AppColors.mutedFor(context),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 12),
@@ -91,7 +148,73 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       ),
                 ),
               ),
-              SizedBox(height: ResponsiveLayout.space(2.5)),
+              SizedBox(height: ResponsiveLayout.space(2)),
+
+              // Search & Filter Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: ShapeDecoration(
+                  color: AppColors.surfaceFor(context),
+                  shape: SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(
+                      cornerRadius: 16,
+                      cornerSmoothing: 0.6,
+                    ),
+                    side: BorderSide(
+                      color: AppColors.strokeFor(context),
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.search_rounded,
+                      size: 18,
+                      color: AppColors.curveRed,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        style: TextStyle(
+                          color: AppColors.textFor(context),
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        cursorColor: AppColors.curveRed,
+                        decoration: InputDecoration(
+                          hintText: 'Filter vault assets (e.g. "Solita", "Matcha", "Team", "Pillars")...',
+                          hintStyle: TextStyle(
+                            color: AppColors.mutedFor(context),
+                            fontSize: 13,
+                          ),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ),
+                    if (_searchQuery.isNotEmpty)
+                      IconButton(
+                        onPressed: _clearSearch,
+                        tooltip: 'Clear search',
+                        icon: Icon(
+                          Icons.cancel_rounded,
+                          size: 16,
+                          color: AppColors.mutedFor(context),
+                        ),
+                        style: IconButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(24, 24),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              SizedBox(height: ResponsiveLayout.space(1.5)),
 
               // Filter Category Chips
               SingleChildScrollView(
@@ -195,37 +318,91 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
               SizedBox(height: ResponsiveLayout.space(2.5)),
 
-              // Grid of Visual Cards
-              LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints constraints) {
-                  final double gap = ResponsiveLayout.space(2.5);
-                  final double tileWidth =
-                      (constraints.maxWidth - gap * (columns - 1)) / columns;
-
-                  return Wrap(
-                    spacing: gap,
-                    runSpacing: gap,
-                    children: List<Widget>.generate(filteredItems.length,
-                        (int index) {
-                      final GalleryItem item = filteredItems[index];
-                      return SizedBox(
-                        width: columns == 1 ? constraints.maxWidth : tileWidth,
-                        child: AspectRatio(
-                          aspectRatio: 1.16,
-                          child: LiquidGlassImageCard(
-                            path: item.path,
-                            title: item.title,
-                            category: item.category,
-                            description: item.description,
-                            aspectRatio: item.aspectRatio,
-                            isNetwork: item.isNetwork,
-                          ),
+              // Grid of Visual Cards or Empty State
+              if (filteredItems.isEmpty)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+                  decoration: ShapeDecoration(
+                    color: AppColors.surfaceFor(context),
+                    shape: SmoothRectangleBorder(
+                      borderRadius: SmoothBorderRadius(
+                        cornerRadius: 22,
+                        cornerSmoothing: 0.6,
+                      ),
+                      side: BorderSide(
+                        color: AppColors.strokeFor(context),
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.image_not_supported_outlined,
+                        size: 40,
+                        color: AppColors.mutedFor(context),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        'No Vault Assets Match "$_searchQuery"',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textFor(context),
+                            ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Try searching for different keywords or reset your category filter.',
+                        style: TextStyle(
+                          color: AppColors.mutedFor(context),
+                          fontSize: 13,
                         ),
-                      );
-                    }),
-                  );
-                },
-              ),
+                      ),
+                      const SizedBox(height: 18),
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          _clearSearch();
+                          setState(() => _selectedCategory = 'All');
+                        },
+                        icon: const Icon(Icons.refresh_rounded, size: 14),
+                        label: const Text('Reset Filters'),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    final double gap = ResponsiveLayout.space(2.5);
+                    final double tileWidth =
+                        (constraints.maxWidth - gap * (columns - 1)) / columns;
+
+                    return Wrap(
+                      spacing: gap,
+                      runSpacing: gap,
+                      children: List<Widget>.generate(filteredItems.length,
+                          (int index) {
+                        final GalleryItem item = filteredItems[index];
+                        return SizedBox(
+                          width: columns == 1 ? constraints.maxWidth : tileWidth,
+                          child: AspectRatio(
+                            aspectRatio: 1.16,
+                            child: LiquidGlassImageCard(
+                              path: item.path,
+                              title: item.title,
+                              category: item.category,
+                              description: item.description,
+                              aspectRatio: item.aspectRatio,
+                              isNetwork: item.isNetwork,
+                            ),
+                          ),
+                        );
+                      }),
+                    );
+                  },
+                ),
             ],
           ),
         ),

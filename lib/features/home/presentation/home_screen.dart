@@ -415,8 +415,16 @@ class _BentoCardState extends State<_BentoCard> {
 // =========================================================================
 // SECTION 3: STRATEGY COMPARISON ("Straight Lines vs. The Curve")
 // =========================================================================
-class _StrategyComparisonSection extends StatelessWidget {
+class _StrategyComparisonSection extends StatefulWidget {
   const _StrategyComparisonSection();
+
+  @override
+  State<_StrategyComparisonSection> createState() =>
+      _StrategyComparisonSectionState();
+}
+
+class _StrategyComparisonSectionState extends State<_StrategyComparisonSection> {
+  int _selectedMode = 0; // 0: The Creative Curve, 1: Conventional Linear
 
   @override
   Widget build(BuildContext context) {
@@ -459,6 +467,29 @@ class _StrategyComparisonSection extends StatelessWidget {
                         ),
                       ),
                     ),
+                    // Live Mode Indicator Badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.06)
+                            : const Color(0xFFEDEFF3),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        _selectedMode == 0
+                            ? '● EXPONENTIAL MOMENTUM'
+                            : '○ LINEAR DRIFT',
+                        style: TextStyle(
+                          color: _selectedMode == 0
+                              ? AppColors.curveRed
+                              : AppColors.mutedFor(context),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 14),
@@ -473,21 +504,109 @@ class _StrategyComparisonSection extends StatelessWidget {
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 720),
                   child: Text(
-                    'Straightforward strategies yield predictable results. We build non-linear, high-velocity momentum.',
+                    'Straightforward linear processes yield predictable, easily forgotten outcomes. We engineer non-linear, high-velocity compound brand momentum.',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           color: AppColors.mutedFor(context),
                           height: 1.5,
                         ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
+                // Interactive Trajectory Curve Switcher
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 8,
+                  children: [
+                    _ModelTab(
+                      label: 'The Creative Curve (Our Architecture)',
+                      active: _selectedMode == 0,
+                      onTap: () => setState(() => _selectedMode = 0),
+                    ),
+                    _ModelTab(
+                      label: 'Conventional Straight Line (Standard Agencies)',
+                      active: _selectedMode == 1,
+                      onTap: () => setState(() => _selectedMode = 1),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // Interactive Trajectory Graph Canvas
+                ClipSmoothRect(
+                  radius: SmoothBorderRadius(
+                    cornerRadius: 18,
+                    cornerSmoothing: 0.6,
+                  ),
+                  child: Container(
+                    height: 180,
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF101014)
+                          : const Color(0xFFF3F5F8),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: AppColors.strokeFor(context),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: CustomPaint(
+                      painter: _TrajectoryCurvePainter(
+                        isCurve: _selectedMode == 0,
+                        isDark: isDark,
+                      ),
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            top: 4,
+                            left: 4,
+                            child: Text(
+                              _selectedMode == 0
+                                  ? 'ACCELERATING VELOCITY [CUBIC EXPONENTIAL]'
+                                  : 'LINEAR PLATEAU [STANDSTILL]',
+                              style: TextStyle(
+                                color: _selectedMode == 0
+                                    ? AppColors.curveRed
+                                    : AppColors.mutedFor(context),
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 2,
+                            right: 4,
+                            child: Text(
+                              _selectedMode == 0
+                                  ? '4.2x Category Retention Velocity'
+                                  : '1.0x Slow Baseline Plateau',
+                              style: TextStyle(
+                                color: _selectedMode == 0
+                                    ? AppColors.curveRed
+                                    : AppColors.mutedFor(context),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Strategic Comparison Grid Boxes
                 if (stack) ...[
-                  const _ComparisonBox(
+                  _ComparisonBox(
                     isCurve: false,
+                    highlighted: _selectedMode == 1,
                     title: 'The Straight Line (Standard Agencies)',
                     subtitle: 'Safe, fragmented, and easily forgotten.',
-                    items: [
+                    items: const [
                       'Cookie-cutter templates & safe trend imitation',
                       'Fragmented freelancer handoffs and slow turnaround',
                       'Vanity metrics with zero commercial translation',
@@ -495,11 +614,12 @@ class _StrategyComparisonSection extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const _ComparisonBox(
+                  _ComparisonBox(
                     isCurve: true,
+                    highlighted: _selectedMode == 0,
                     title: 'The Creative Curve (Our Model)',
                     subtitle: 'Bespoke, interdisciplinary, and category-defining.',
-                    items: [
+                    items: const [
                       'Bespoke visual architecture that sets new trends',
                       'Dedicated 4-specialist squad working in tight synchronization',
                       'Engineered for measurable revenue velocity and brand equity',
@@ -507,15 +627,16 @@ class _StrategyComparisonSection extends StatelessWidget {
                     ],
                   ),
                 ] else ...[
-                  const Row(
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: _ComparisonBox(
                           isCurve: false,
+                          highlighted: _selectedMode == 1,
                           title: 'The Straight Line (Standard Agencies)',
                           subtitle: 'Safe, fragmented, and easily forgotten.',
-                          items: [
+                          items: const [
                             'Cookie-cutter templates & safe trend imitation',
                             'Fragmented freelancer handoffs and slow turnaround',
                             'Vanity metrics with zero commercial translation',
@@ -523,13 +644,14 @@ class _StrategyComparisonSection extends StatelessWidget {
                           ],
                         ),
                       ),
-                      SizedBox(width: 20),
+                      const SizedBox(width: 20),
                       Expanded(
                         child: _ComparisonBox(
                           isCurve: true,
+                          highlighted: _selectedMode == 0,
                           title: 'The Creative Curve (Our Model)',
                           subtitle: 'Bespoke, interdisciplinary, and category-defining.',
-                          items: [
+                          items: const [
                             'Bespoke visual architecture that sets new trends',
                             'Dedicated 4-specialist squad working in synchronization',
                             'Engineered for revenue velocity and brand equity',
@@ -549,24 +671,208 @@ class _StrategyComparisonSection extends StatelessWidget {
   }
 }
 
+class _ModelTab extends StatelessWidget {
+  const _ModelTab({
+    required this.label,
+    required this.active,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool active;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isDark = AppColors.isDark(context);
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: active
+                ? (isDark ? const Color(0xFF221617) : const Color(0xFFFFECEB))
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: active
+                  ? AppColors.curveRed.withValues(alpha: 0.6)
+                  : AppColors.strokeFor(context),
+              width: 1.0,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 7,
+                height: 7,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: active ? AppColors.curveRed : AppColors.mutedFor(context),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  color: active ? AppColors.curveRed : AppColors.textFor(context),
+                  fontSize: 12.5,
+                  fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TrajectoryCurvePainter extends CustomPainter {
+  const _TrajectoryCurvePainter({
+    required this.isCurve,
+    required this.isDark,
+  });
+
+  final bool isCurve;
+  final bool isDark;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Subtle grid lines
+    final Paint gridPaint = Paint()
+      ..color = (isDark ? Colors.white : Colors.black).withValues(alpha: 0.05)
+      ..strokeWidth = 1.0;
+
+    for (double y = 20; y < size.height; y += 35) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
+    }
+
+    const double startX = 20;
+    final double startY = size.height - 30;
+    final double endX = size.width - 24;
+
+    if (isCurve) {
+      // The Creative Curve: Smooth Exponential Upward Trajectory
+      const double endY = 24;
+      final double controlX1 = size.width * 0.42;
+      final double controlY1 = size.height - 28;
+      final double controlX2 = size.width * 0.72;
+      final double controlY2 = size.height * 0.35;
+
+      final Path curvePath = Path()
+        ..moveTo(startX, startY)
+        ..cubicTo(controlX1, controlY1, controlX2, controlY2, endX, endY);
+
+      // Filled gradient area beneath the curve
+      final Path fillPath = Path.from(curvePath)
+        ..lineTo(endX, size.height)
+        ..lineTo(startX, size.height)
+        ..close();
+
+      final Paint fillPaint = Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.curveRed.withValues(alpha: 0.22),
+            AppColors.curveRed.withValues(alpha: 0.0),
+          ],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+
+      canvas.drawPath(fillPath, fillPaint);
+
+      // Vibrant curve stroke
+      final Paint strokePaint = Paint()
+        ..color = AppColors.curveRed
+        ..strokeWidth = 3.2
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+
+      canvas.drawPath(curvePath, strokePaint);
+
+      // Trajectory Milestone Dots
+      final List<Offset> points = [
+        Offset(startX, startY),
+        Offset(size.width * 0.44, size.height * 0.76),
+        Offset(size.width * 0.74, size.height * 0.38),
+        Offset(endX, endY),
+      ];
+
+      for (int i = 0; i < points.length; i++) {
+        final Offset pt = points[i];
+        final bool isLast = i == points.length - 1;
+
+        if (isLast) {
+          final Paint glowPaint = Paint()
+            ..color = AppColors.curveRed.withValues(alpha: 0.35);
+          canvas.drawCircle(pt, 9, glowPaint);
+        }
+
+        final Paint dotPaint = Paint()..color = AppColors.curveRed;
+        canvas.drawCircle(pt, isLast ? 5.5 : 4.0, dotPaint);
+
+        final Paint innerDot = Paint()..color = Colors.white;
+        canvas.drawCircle(pt, isLast ? 2.5 : 1.8, innerDot);
+      }
+    } else {
+      // The Conventional Line: Slow Linear Rise that quickly stalls
+      final double endY = size.height * 0.65;
+      final double plateauStartX = size.width * 0.48;
+
+      final Path linearPath = Path()
+        ..moveTo(startX, startY)
+        ..lineTo(plateauStartX, endY)
+        ..lineTo(endX, endY);
+
+      final Paint linePaint = Paint()
+        ..color = (isDark ? Colors.white60 : Colors.black45)
+        ..strokeWidth = 2.4
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+
+      canvas.drawPath(linearPath, linePaint);
+
+      final Paint plateauDot = Paint()
+        ..color = (isDark ? Colors.white54 : Colors.black45);
+      canvas
+        ..drawCircle(Offset(plateauStartX, endY), 4, plateauDot)
+        ..drawCircle(Offset(endX, endY), 5, plateauDot);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _TrajectoryCurvePainter oldDelegate) {
+    return oldDelegate.isCurve != isCurve || oldDelegate.isDark != isDark;
+  }
+}
+
 class _ComparisonBox extends StatelessWidget {
   const _ComparisonBox({
     required this.isCurve,
     required this.title,
     required this.subtitle,
     required this.items,
+    this.highlighted = false,
   });
 
   final bool isCurve;
   final String title;
   final String subtitle;
   final List<String> items;
+  final bool highlighted;
 
   @override
   Widget build(BuildContext context) {
     final bool isDark = AppColors.isDark(context);
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
       padding: const EdgeInsets.all(22),
       decoration: ShapeDecoration(
         color: isCurve
@@ -578,12 +884,25 @@ class _ComparisonBox extends StatelessWidget {
             cornerSmoothing: 0.6,
           ),
           side: BorderSide(
-            color: isCurve
-                ? AppColors.curveRed.withValues(alpha: isDark ? 0.45 : 0.3)
-                : AppColors.strokeFor(context),
-            width: isCurve ? 1.2 : 1.0,
+            color: highlighted
+                ? (isCurve
+                    ? AppColors.curveRed
+                    : (isDark ? Colors.white60 : Colors.black54))
+                : (isCurve
+                    ? AppColors.curveRed.withValues(alpha: isDark ? 0.35 : 0.22)
+                    : AppColors.strokeFor(context)),
+            width: highlighted ? 1.6 : 1.0,
           ),
         ),
+        shadows: highlighted && isCurve
+            ? [
+                BoxShadow(
+                  color: AppColors.curveRed.withValues(alpha: isDark ? 0.25 : 0.12),
+                  blurRadius: 20,
+                  offset: const Offset(0, 6),
+                ),
+              ]
+            : [],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

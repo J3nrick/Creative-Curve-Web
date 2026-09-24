@@ -3,8 +3,8 @@ import 'dart:ui';
 import 'package:creative_curve_web/core/constants/app_colors.dart';
 import 'package:creative_curve_web/shared/widgets/liquid_glass_panel.dart';
 import 'package:figma_squircle/figma_squircle.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Shows an ultra-premium full-screen liquid-glass lightbox for examining assets in detail.
 void showImageLightbox(
@@ -101,6 +101,27 @@ void showImageLightbox(
                           ),
                         ),
                         IconButton(
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: '$title ($category) — Creative Curve Studios Vault'));
+                            ScaffoldMessenger.of(dialogContext).showSnackBar(
+                              SnackBar(
+                                content: Text('Copied "$title" to clipboard'),
+                                duration: const Duration(seconds: 2),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            );
+                          },
+                          tooltip: 'Copy Asset Name',
+                          icon: Icon(
+                            Icons.copy_rounded,
+                            size: 17,
+                            color: AppColors.mutedFor(dialogContext),
+                          ),
+                        ),
+                        IconButton(
                           onPressed: () => Navigator.of(dialogContext).pop(),
                           tooltip: 'Close',
                           icon: Icon(
@@ -147,21 +168,68 @@ void showImageLightbox(
                     ),
                   ),
 
-                  // Optional Footer / Description
-                  if (description != null && description.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(22, 0, 22, 16),
-                      child: Text(
-                        description,
-                        style: Theme.of(dialogContext)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(
-                              color: AppColors.mutedFor(dialogContext),
-                              height: 1.45,
+                  // Footer with Description & Studio Metadata Badge
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(22, 0, 22, 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        if (description != null && description.isNotEmpty)
+                          Expanded(
+                            child: Text(
+                              description,
+                              style: Theme.of(dialogContext)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: AppColors.mutedFor(dialogContext),
+                                    height: 1.45,
+                                  ),
                             ),
-                      ),
+                          ),
+                        const SizedBox(width: 14),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 9,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.05)
+                                : const Color(0xFFF0F2F5),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: AppColors.strokeFor(dialogContext),
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 5,
+                                height: 5,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.curveRed,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'CREATIVE CURVE VAULT • 4K PRO',
+                                style: TextStyle(
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.8,
+                                  color: AppColors.mutedFor(dialogContext),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
                 ],
               ),
             ),

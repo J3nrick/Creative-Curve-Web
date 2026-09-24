@@ -1,9 +1,11 @@
 import 'package:creative_curve_web/core/constants/app_assets.dart';
 import 'package:creative_curve_web/core/theme/curve_theme_extension.dart';
 import 'package:creative_curve_web/core/theme/theme_mode_provider.dart';
+import 'package:creative_curve_web/features/contact_modal/presentation/contact_modal_screen.dart';
 import 'package:creative_curve_web/features/gallery/data/gallery_catalog.dart';
 import 'package:creative_curve_web/features/team/application/team_provider.dart';
 import 'package:creative_curve_web/shared/interactions/cursor_magnet_scope.dart';
+import 'package:creative_curve_web/shared/interactions/studio_command_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -104,6 +106,44 @@ void main() {
       );
 
       expect(find.text('Magnetic Action'), findsOneWidget);
+    });
+  });
+
+  group('Studio Command Palette & Intake Brief Tests', () {
+    testWidgets('StudioCommandPalette renders search input and command list', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: StudioCommandPalette(),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(TextField), findsOneWidget);
+      expect(find.text('Studio Overview & Deck'), findsOneWidget);
+      expect(find.text('Capabilities & Disciplines'), findsOneWidget);
+      expect(find.text('The Crafters Collective'), findsOneWidget);
+    });
+
+    testWidgets('ContactModalScreen renders interactive scope configurator', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: ContactModalScreen(),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Initiate Studio Project Brief'), findsOneWidget);
+      expect(find.text('1. SELECT CRAFT DISCIPLINES'), findsOneWidget);
+      expect(find.text('2. DESIRED DELIVERY CADENCE'), findsOneWidget);
+      expect(find.text('3. ESTIMATED INVESTMENT TIER'), findsOneWidget);
+      expect(find.text('Brand Architecture'), findsOneWidget);
+      expect(find.text('hello@creativecurve.ph'), findsOneWidget);
     });
   });
 }

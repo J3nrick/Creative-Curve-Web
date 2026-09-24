@@ -4,10 +4,12 @@ import 'package:creative_curve_web/core/constants/app_colors.dart';
 import 'package:creative_curve_web/core/theme/curve_theme_extension.dart';
 import 'package:creative_curve_web/core/theme/theme_mode_provider.dart';
 import 'package:creative_curve_web/shared/interactions/cursor_magnet_scope.dart';
+import 'package:creative_curve_web/shared/interactions/studio_command_palette.dart';
 import 'package:creative_curve_web/shared/layout/widgets/side_nav_bar.dart';
 import 'package:creative_curve_web/shared/widgets/curve_logo.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -82,9 +84,20 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
             ],
           );
 
-    return Scaffold(
-      backgroundColor: tokens.background,
-      body: frame,
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.keyK, meta: true): () =>
+            StudioCommandPalette.show(context),
+        const SingleActivator(LogicalKeyboardKey.keyK, control: true): () =>
+            StudioCommandPalette.show(context),
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scaffold(
+          backgroundColor: tokens.background,
+          body: frame,
+        ),
+      ),
     );
   }
 
@@ -134,6 +147,20 @@ class _MobileShell extends StatelessWidget {
                           semanticLabel: 'Creative Curve logo',
                         ),
                         const Spacer(),
+                        CursorMagnetScope(
+                          maxDistance: 6.0,
+                          strength: 0.3,
+                          child: IconButton(
+                            onPressed: () => StudioCommandPalette.show(context),
+                            tooltip: 'Search & Studio Palette (⌘K)',
+                            icon: Icon(
+                              Icons.search_rounded,
+                              size: 20,
+                              color: tokens.textPrimary,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
                         CursorMagnetScope(
                           maxDistance: 6.0,
                           strength: 0.3,

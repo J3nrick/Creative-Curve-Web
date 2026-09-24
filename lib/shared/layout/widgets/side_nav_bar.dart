@@ -1,8 +1,11 @@
+import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:creative_curve_web/core/constants/app_colors.dart';
 import 'package:creative_curve_web/core/theme/curve_theme_extension.dart';
 import 'package:creative_curve_web/shared/interactions/cursor_magnet_scope.dart';
+import 'package:creative_curve_web/shared/interactions/studio_command_palette.dart';
 import 'package:creative_curve_web/shared/widgets/curve_logo.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
@@ -127,6 +130,19 @@ class SideNavBar extends StatelessWidget {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 6),
+
+                    // Quick Command Palette Trigger (⌘K)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: CursorMagnetScope(
+                        maxDistance: 6.0,
+                        strength: 0.22,
+                        child: _SideNavCommandTrigger(
+                          onTap: () => StudioCommandPalette.show(context),
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 8),
 
                     // Navigation Links with Magnetic Hover Physics
@@ -155,7 +171,7 @@ class SideNavBar extends StatelessWidget {
                       ),
                     ),
 
-                    // Studio Status Indicator Badge
+                    // Studio Status & Live Clock Indicator Badge
                     const CursorMagnetScope(
                       maxDistance: 5.0,
                       strength: 0.18,
@@ -269,128 +285,265 @@ class _SideNavButtonState extends State<_SideNavButton> {
       ),
     );
   }
+}// --- QUICK COMMAND TRIGGER ---
+
+class _SideNavCommandTrigger extends StatefulWidget {
+  const _SideNavCommandTrigger({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  State<_SideNavCommandTrigger> createState() => _SideNavCommandTriggerState();
 }
 
-// --- STUDIO STATUS BADGE ---
-
-class _StudioStatusBadge extends StatelessWidget {
-  const _StudioStatusBadge();
+class _SideNavCommandTriggerState extends State<_SideNavCommandTrigger> {
+  bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
     final bool isDark = context.isDarkMode;
     final CurveThemeExtension tokens = context.curveTheme;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      decoration: ShapeDecoration(
-        color: isDark ? const Color(0xFF19191D) : const Color(0xFFF3F4F6),
-        shape: SmoothRectangleBorder(
-          borderRadius: SmoothBorderRadius(
-            cornerRadius: 14,
-            cornerSmoothing: 0.6,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          decoration: ShapeDecoration(
+            color: _hovered
+                ? (isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : const Color(0xFFE5E8ED))
+                : (isDark
+                    ? Colors.white.withValues(alpha: 0.04)
+                    : const Color(0xFFEDEFF3)),
+            shape: SmoothRectangleBorder(
+              borderRadius: SmoothBorderRadius(
+                cornerRadius: 12,
+                cornerSmoothing: 0.6,
+              ),
+              side: BorderSide(
+                color: _hovered
+                    ? AppColors.curveRed.withValues(alpha: 0.5)
+                    : tokens.stroke,
+                width: 1.0,
+              ),
+            ),
           ),
-          side: BorderSide(
-            color: tokens.stroke,
-            width: 1.0,
-          ),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const _LiveStatusDot(),
-              const SizedBox(width: 5),
-              Flexible(
-                child: Text(
-                  'STUDIO',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: tokens.textMuted,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 9.5,
-                    letterSpacing: 1.2,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              Icon(
+                Icons.search_rounded,
+                size: 13,
+                color: _hovered ? AppColors.curveRed : tokens.textMuted,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '⌘K',
+                style: TextStyle(
+                  color: _hovered ? tokens.textPrimary : tokens.textMuted,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 3),
-          Text(
-            'Accepting\nProjects',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: tokens.textPrimary,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 10,
-                  height: 1.15,
-                ),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _LiveStatusDot extends StatefulWidget {
-  const _LiveStatusDot();
+// --- STUDIO STATUS BADGE & LIVE UTC+8 CLOCK ---
+
+class _StudioStatusBadge extends StatefulWidget {
+  const _StudioStatusBadge();
 
   @override
-  State<_LiveStatusDot> createState() => _LiveStatusDotState();
+  State<_StudioStatusBadge> createState() => _StudioStatusBadgeState();
 }
 
-class _LiveStatusDotState extends State<_LiveStatusDot>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
+class _StudioStatusBadgeState extends State<_StudioStatusBadge> {
+  late Timer _clockTimer;
+  late DateTime _phTime;
 
   @override
   void initState() {
     super.initState();
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    )..repeat(reverse: true);
-
-    _pulseAnimation = Tween<double>(begin: 0.4, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
+    _phTime = DateTime.now().toUtc().add(const Duration(hours: 8));
+    _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      setState(() {
+        _phTime = DateTime.now().toUtc().add(const Duration(hours: 8));
+      });
+    });
   }
 
   @override
   void dispose() {
-    _pulseController.dispose();
+    _clockTimer.cancel();
+    super.dispose();
+  }
+
+  String _formatTime(DateTime dt) {
+    final int hour = dt.hour;
+    final int minute = dt.minute;
+    final String period = hour >= 12 ? 'PM' : 'AM';
+    final int displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+    final String minuteStr = minute.toString().padLeft(2, '0');
+    return '$displayHour:$minuteStr $period';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isDark = context.isDarkMode;
+    final CurveThemeExtension tokens = context.curveTheme;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => StudioCommandPalette.show(context),
+        child: Tooltip(
+          message: 'Creative Curve Studio HQ • UTC+8 (PH) • Open Palette (⌘K)',
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            decoration: ShapeDecoration(
+              color: isDark ? const Color(0xFF19191D) : const Color(0xFFF3F4F6),
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: 14,
+                  cornerSmoothing: 0.6,
+                ),
+                side: BorderSide(
+                  color: tokens.stroke,
+                  width: 1.0,
+                ),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const _KineticSoundwave(),
+                    const SizedBox(width: 5),
+                    Flexible(
+                      child: Text(
+                        'STUDIO',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: tokens.textMuted,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 9.5,
+                          letterSpacing: 1.2,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  _formatTime(_phTime),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: AppColors.curveRed,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 9.5,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Accepting Projects',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: tokens.textPrimary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 9.5,
+                        height: 1.15,
+                      ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _KineticSoundwave extends StatefulWidget {
+  const _KineticSoundwave();
+
+  @override
+  State<_KineticSoundwave> createState() => _KineticSoundwaveState();
+}
+
+class _KineticSoundwaveState extends State<_KineticSoundwave>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _pulseAnimation,
+      animation: _controller,
       builder: (context, child) {
-        return Container(
-          width: 7,
-          height: 7,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: const Color(0xFF34C759),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF34C759)
-                    .withValues(alpha: _pulseAnimation.value * 0.6),
-                blurRadius: 6,
-                spreadRadius: 1,
-              ),
+        final double v = _controller.value;
+        final double h1 = 3.0 + 5.0 * (0.5 + 0.5 * math.sin(v * 6.28));
+        final double h2 = 4.0 + 7.0 * (0.5 + 0.5 * math.sin((v * 6.28) + 1.2));
+        final double h3 = 3.0 + 6.0 * (0.5 + 0.5 * math.sin((v * 6.28) + 2.4));
+
+        return SizedBox(
+          width: 10,
+          height: 11,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _soundBar(h1),
+              _soundBar(h2),
+              _soundBar(h3),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _soundBar(double height) {
+    return Container(
+      width: 2.0,
+      height: height.clamp(3.0, 11.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF34C759),
+        borderRadius: BorderRadius.circular(1),
+      ),
     );
   }
 }
